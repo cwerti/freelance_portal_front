@@ -1,0 +1,1 @@
+export default function CreateProject() { return <h1>Создание проекта</h1>; }

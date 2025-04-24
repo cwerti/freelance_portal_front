@@ -1,0 +1,1 @@
+export default function ProjectDetails() { return <h1>Детали проекта</h1>; }
