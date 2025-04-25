@@ -15,31 +15,31 @@ const Register = () => {
   return (
     <div className="register-container">
       <form className="register-form" onSubmit={handleSubmit}>
-        <h2>Sign Up</h2>
+        <h2>Регистрация</h2>
         <input
           type="text"
-          placeholder="Full Name"
+          placeholder="Имя"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Электронная почта"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Пароль"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Register</button>
+        <button type="submit">Зарегистрироваться</button>
         <p className="login-link">
-          Already have an account? <a href="/login">Sign In</a>
+        У вас уже есть аккаунт? <a href="/login">Войти</a>
         </p>
       </form>
     </div>

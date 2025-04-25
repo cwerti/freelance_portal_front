@@ -1,44 +1,38 @@
+import React from "react";
+import Header from "../components/Header";
 import { Link } from "react-router-dom";
 import "../styles/Home.css";
 
-function Home() {
+
+const Home = () => {
   return (
-    <div className="home-container">
-      <header className="header">
-        <div className="logo">Freelance_STUdio</div>
+    <div className="home">
+      <Header />
+      
+      <main className="home-main">
+        <section className="banner">
+          <h1>Найдите идеального фрилансера для вашей задачи</h1>
+          <p>Выполняйте работу быстро, доступно и профессионально</p>
+        </section>
 
-        <div className="search-bar">
-          <input type="text" placeholder="Search..." />
-          <button>Search</button>
-        </div>
+        <section className="categories">
+          <h2>Популярные категории</h2>
+          <div className="category-grid">
+            <div className="category-card">Дизайн</div>
+            <div className="category-card">Разработка</div>
+            <div className="category-card">Письмо</div>
+            <div className="category-card">Маркетинг</div>
+            <div className="category-card">Видео и анимация</div>
+            <div className="category-card">Музыка и аудио</div>
+          </div>
+        </section>
+      </main>
 
-        <div className="auth-buttons">
-          <Link to="/login">
-            <button className="sign-in">Sign in</button>
-          </Link>
-          <Link to="/register">
-            <button className="sign-up">Sign up</button>
-          </Link>
-        </div>
-      </header>
-
-      <div className="banner">Photo*</div>
-
-      <div className="main-section">
-        <aside className="sidebar">
-          <h2>Services</h2>
-          <p>Categories</p>
-        </aside>
-
-        <div className="cards">
-          {/* Здесь можно разместить карточки проектов */}
-          {[...Array(6)].map((_, i) => (
-            <div className="card" key={i}></div>
-          ))}
-        </div>
-      </div>
+      <footer className="home-footer">
+        <p>© 2025 Freelance_STUdio. Все права защищены.</p>
+      </footer>
     </div>
   );
-}
+};
 
 export default Home;
