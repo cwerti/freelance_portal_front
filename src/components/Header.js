@@ -9,10 +9,6 @@ const Header = () => {
         <span>Freelance_</span>
         <span className="studio">STUdio</span>
       </Link>
-      <div className="search-container">
-        <input type="text" placeholder="Введите запрос" />
-        <button>Поиск</button>
-      </div>
       <div className="auth-buttons">
         <Link to="/login">
           <button className="auth-btn">Войти</button>

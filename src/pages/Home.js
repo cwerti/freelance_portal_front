@@ -1,14 +1,10 @@
 import React from "react";
-import Header from "../components/Header";
-import { Link } from "react-router-dom";
 import "../styles/Home.css";
 
 
 const Home = () => {
   return (
     <div className="home">
-      <Header />
-      
       <main className="home-main">
         <section className="banner">
           <h1>Найдите идеального фрилансера для вашей задачи</h1>
