@@ -1,12 +1,9 @@
 import React from "react";
 import "../styles/Profile.css";
-import Header from "../components/Header";
 
 const Profile = () => {
   return (
     <div className="profile-container">
-      <Header />
-
       <div className="profile-content">
         <div className="profile-left">
           <div className="avatar" />
