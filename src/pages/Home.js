@@ -1,32 +1,31 @@
 import React from "react";
 import "../styles/Home.css";
 
-
 const Home = () => {
   return (
-    <div className="home">
-      <main className="home-main">
-        <section className="banner">
-          <h1>Найдите идеального фрилансера для вашей задачи</h1>
-          <p>Выполняйте работу быстро, доступно и профессионально</p>
-        </section>
+    <div className="home-container">
+      <div className="home-content">
+        <h1 className="home-title">Добро пожаловать в Freelance_STUdio</h1>
 
-        <section className="categories">
-          <h2>Популярные категории</h2>
-          <div className="category-grid">
+        <div className="search-section">
+          <input
+            type="text"
+            placeholder="Поиск услуг..."
+            className="search-input"
+          />
+          <button className="search-button">Поиск</button>
+        </div>
+
+        <div className="category-section">
+          <h2>Категории</h2>
+          <div className="category-list">
             <div className="category-card">Дизайн</div>
-            <div className="category-card">Разработка</div>
-            <div className="category-card">Письмо</div>
+            <div className="category-card">Программирование</div>
             <div className="category-card">Маркетинг</div>
-            <div className="category-card">Видео и анимация</div>
-            <div className="category-card">Музыка и аудио</div>
+            <div className="category-card">Переводы</div>
           </div>
-        </section>
-      </main>
-
-      <footer className="home-footer">
-        <p>© 2025 Freelance_STUdio. Все права защищены.</p>
-      </footer>
+        </div>
+      </div>
     </div>
   );
 };

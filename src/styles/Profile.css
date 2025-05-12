@@ -1,49 +1,36 @@
 .profile-container {
   font-family: 'Arial', sans-serif;
   background-color: #ffffff;
-  padding: 20px;
+  min-height: 100vh;
 }
 
 .profile-content {
-  display: flex;
+  max-width: 900px;
+  margin: 40px auto;
   padding: 20px;
 }
 
-.profile-left {
-  background-color: #ddd;
-  padding: 20px;
-  border-radius: 8px;
-  width: 180px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-right: 40px;
-}
-
-.avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: #a28585;
-  margin-bottom: 20px;
-}
-
-.user-info p {
-  margin: 5px 0;
-  font-size: 16px;
+.profile-info {
+  background-color: #e0e0e0;
+  padding: 30px;
+  border-radius: 10px;
+  margin-bottom: 30px;
   text-align: center;
-  font-family: 'Courier New', Courier, monospace;
+  font-size: 18px;
 }
 
-.profile-right {
-  flex: 1;
-}
-
-.section {
-  background-color: #ddd;
-  padding: 15px;
+.profile-section {
+  background-color: #dddddd;
+  padding: 25px;
+  border-radius: 10px;
   margin-bottom: 20px;
-  border-radius: 6px;
+}
+
+.profile-section.large {
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .section-header {
@@ -52,17 +39,10 @@
   align-items: center;
 }
 
-.create-button {
-  background-color: #f2ffad;
-  border: none;
-  padding: 6px 12px;
+.create-order-button {
+  background-color: white;
+  border: 2px solid #333;
+  padding: 6px 14px;
   font-family: 'Courier New', Courier, monospace;
   cursor: pointer;
-}
-
-.reviews {
-  background-color: #ddd;
-  padding: 40px;
-  text-align: center;
-  border-radius: 6px;
 }
