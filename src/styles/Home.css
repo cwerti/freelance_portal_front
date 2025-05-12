@@ -6,6 +6,43 @@
   flex-direction: column;
 }
 
+.block{
+    width: 276px;
+    height: 275px;
+    flex-shrink: 0;
+    border-radius: 15px;
+    background: #D9D9D9;    
+}
+
+.block-item {
+  width: 250px; 
+  height: 250px; 
+  transition: transform 0.3s ease;
+}
+
+.blocks-container {
+  display: flex;
+  gap: 30px; /* Расстояние между блоками */
+  padding: 20px;
+  overflow-x: auto; 
+}
+
+.block-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.block-item h3 {
+  margin: 5px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.block-item p {
+  margin: 3px 0;
+  color: #666;
+}
+
 .home-content {
   padding: 40px;
   flex: 1;

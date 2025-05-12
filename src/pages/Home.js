@@ -1,5 +1,6 @@
 import React from "react";
 import "../styles/Home.css";
+import { BlockList } from "../components/Blocks.jsx"
 
 const Home = () => {
   return (
@@ -24,6 +25,7 @@ const Home = () => {
             <div className="category-card">Маркетинг</div>
             <div className="category-card">Переводы</div>
           </div>
+          <BlockList />
         </div>
       </div>
     </div>
