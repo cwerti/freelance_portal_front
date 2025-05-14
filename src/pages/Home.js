@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/Home.css";
-import { BlockList } from "../components/Blocks.jsx"
+import { BlockList } from "../components/Blocks.js"
 
 const Home = () => {
   return (
