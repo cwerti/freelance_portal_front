@@ -1,35 +1,78 @@
 .project-details-container {
-    padding: 40px;
-    background-color: #f5f5f5;
-    max-width: 700px;
+    padding: 5% 5% 10%;
+    background-color: #f8f9fa;
+    max-width: 90%;
+    width: 700px;
+    min-height: 100vh;
     margin: 0 auto;
-    border-radius: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .project-details-container h2 {
+    border-radius: 2.5%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.project-item:hover {
+    transform: scale(1.03);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+.project-image {
+    max-width: 95%;
+    height: auto;
+    border-radius: 1.5rem;
+    margin: 5% auto;
+    display: block;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.project-image:hover {
+    transform: translateY(-2px);
+}
+
+.project-details-container h2 {
     text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  .project-info {
-    background-color: #e0e0e0;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-  }
-  
-  .project-info h3 {
-    margin: 0 0 10px 0;
-  }
-  
-  .project-details-container button {
-    background-color: #edfcb4;
-    color: #111;
-    border: 1px solid #a3d363;
-    padding: 10px 20px;
-    border-radius: 12px;
+    margin: 0 0 5%;
+    color: #2d3436;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    letter-spacing: -0.05em;
+}
+
+.project-info {
+    background-color: #ffffff;
+    padding: 5%;
+    border-radius: 1.2rem;
+    margin-bottom: 5%;
+    border: 1px solid #e9ecef;
+}
+
+.project-info h3 {
+    margin: 0 0 5%;
+    color: #495057;
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+}
+
+.project-info p {
+    margin: 3% 0;
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+.project-details-container button {
+    background-color: #f1f3f5;
+    color: #212529;
+    border: 1px solid #dee2e6;
+    padding: 3% 6%;
+    border-radius: 1rem;
     cursor: pointer;
-  }
-  
+    transition: all 0.2s ease;
+    display: block;
+    width: 50%;
+    margin: 0 auto;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.project-details-container button:hover {
+    background-color: #e9ecef;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
