@@ -8,6 +8,7 @@ import Footer from "./components/Footer";
 import CreateProject from './pages/CreateProject';
 import ProjectDetails from './pages/ProjectDetails';
 import AdminPanel from "./pages/AdminPanel";
+import Chats from "./pages/Chats";
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/Chats" element={<Chats />} />
       </Routes>
       <Footer />
     </Router>
