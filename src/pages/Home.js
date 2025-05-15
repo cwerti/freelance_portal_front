@@ -25,7 +25,6 @@ const Home = () => {
               <Link to="/category/Программирование" className="category-card">Программирование</Link>
               <Link to="/category/Маркетинг" className="category-card">Маркетинг</Link>
           </div>
-          <BlockList />
         </div>
       </div>
     </div>

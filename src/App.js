@@ -28,9 +28,9 @@ function App() {
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/chats" element={<Chats userId={2} />} />
-        <Route path="/chat/:chatId" element={<ChatPage userId={2} />} />
-        <Route path="/categoryPage/:categoryName" element={<CategoryPage />} />
+        <Route path="/chats" element={<Chats />} />
+        <Route path="/chat/:chatId" element={<ChatPage />} />
+        <Route path="/category/:categoryName" element={<CategoryPage />} />
       </Routes>
       <Footer />
     </Router>
