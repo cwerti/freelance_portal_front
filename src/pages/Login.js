@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+
 import { redirect, useNavigate } from "react-router-dom"; // Для перенаправления
+
 import "../styles/Login.css";
 import Header from "../components/Header";
 
@@ -20,11 +22,13 @@ const Login = () => {
         },
         body: JSON.stringify({ login: login, password: password }),  // Отправляем login и password
       });
+
       if (response.ok) {
         const data = await response.json();
         addCookie("access_token", data[1], 3);
 
         window.location.href = '/';
+
       } else {
         const errorData = await response.json();
         setError(errorData.detail || "Не удалось авторизоваться");

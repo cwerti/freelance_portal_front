@@ -101,8 +101,10 @@ const Register = () => {
           {/* Добавьте другие роли по необходимости */}
         </select>
 
+
         {error && <p className="error">{typeof error === 'object' ? error.message || JSON.stringify(error) : error}</p>}
         {success && <p className="success">{typeof success === 'object' ? success.message || JSON.stringify(success) : success}</p>}
+
 
         <button type="submit">Зарегистрироваться</button>
       </form>

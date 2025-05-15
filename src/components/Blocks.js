@@ -39,8 +39,8 @@ export function BlockList() {
                 <p>Price: {block.Price}</p>
                 <p>Rating: {block.Rating}</p>
             </div>
-             ))}
+            ))}
         </div>
     </>
     );
-  }
+}
