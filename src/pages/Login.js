@@ -1,5 +1,9 @@
 import React, { useState } from "react";
+<<<<<<< HEAD
 import { redirect, useNavigate } from "react-router-dom"; // Для перенаправления
+=======
+import { useNavigate } from "react-router-dom"; // Для перенаправления
+>>>>>>> main
 import "../styles/Login.css";
 import Header from "../components/Header";
 
@@ -20,11 +24,20 @@ const Login = () => {
         },
         body: JSON.stringify({ login: login, password: password }),  // Отправляем login и password
       });
+<<<<<<< HEAD
       if (response.ok) {
         const data = await response.json();
         addCookie("access_token", data[1], 3);
 
         window.location.href = '/';
+=======
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Если вход успешен, перенаправляем на главную страницу (или на страницу профиля)
+        navigate("/"); // Переход на главную страницу
+>>>>>>> main
       } else {
         const errorData = await response.json();
         setError(errorData.detail || "Не удалось авторизоваться");
@@ -32,6 +45,7 @@ const Login = () => {
     } catch (error) {
       setError("Ошибка подключения к серверу");
     }
+<<<<<<< HEAD
   };
 
   const addCookie = (name, value, days) => {
@@ -40,6 +54,8 @@ const Login = () => {
     const expires = `expires=${date.toUTCString()}`;
     console.log(name, value);
     document.cookie = `${name}=${value}; ${expires}; path=/`; // Устанавливаем cookie
+=======
+>>>>>>> main
   };
 
   return (
