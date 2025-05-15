@@ -1,56 +1,77 @@
 .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 30px;
-    background-color: #fff;
-  }
-  
-  .logo {
-    font-weight: bold;
-    font-size: 22px;
-    font-family: 'Courier New', Courier, monospace;
-    background-color: #f5ffc9;
-    padding: 8px 16px;
-    border: 2px solid #3ea2ff;
-    border-radius: 25px;
-    text-decoration: none;
-    color: black;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-  
-  .search-container {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  
-  .search-container input {
-    padding: 4px 8px;
-    border: 1px solid #ccc;
-    font-family: monospace;
-  }
-  
-  .search-container button {
-    background-color: #e4ff9f;
-    border: 1px solid #ccc;
-    padding: 4px 8px;
-    font-family: monospace;
-    cursor: pointer;
-  }
-  
-  .auth-buttons {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .auth-btn {
-    background-color: #e4ff9f;
-    border: none;
-    padding: 6px 12px;
-    font-family: monospace;
-    cursor: pointer;
-  }
-  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 30px;
+  background-color: #fff;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 22px;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #f5ffc9;
+  padding: 8px 16px;
+  border: 2px solid #3ea2ff;
+  border-radius: 25px;
+  text-decoration: none;
+  color: black;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.search-container input {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  font-family: monospace;
+}
+
+.search-container button {
+  background-color: #e4ff9f;
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  font-family: monospace;
+  cursor: pointer;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-btn {
+  background-color: #e4ff9f;
+  border: none;
+  padding: 6px 12px;
+  font-family: monospace;
+  cursor: pointer;
+}
+
+/* Новые стили для отображения данных пользователя */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.auth-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* Стили для кнопки "Выйти" */
+.auth-btn:active {
+  background-color: #f44336;
+  color: white;
+}

@@ -6,7 +6,10 @@ import Profile from "./pages/Profile"; // добавь, если нет
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
+
 function App() {
+
+  
   return (
     <Router>
       <Header />
@@ -14,7 +17,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} /> {/* маршрут */}
+        <Route path="/profile/:id" element={<Profile />} /> {/* маршрут */}
       </Routes>
       <Footer />
     </Router>
