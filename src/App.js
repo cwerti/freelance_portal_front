@@ -11,6 +11,7 @@ import AdminPanel from "./pages/AdminPanel";
 import Chats from "./pages/Chats";
 import ChatPage from "./pages/ChatPage";
 import CategoryPage from "./pages/CategoryPage";
+import AboutPage from "./pages/AboutPage";
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/chats" element={<Chats userId={2} />} />
         <Route path="/chat/:chatId" element={<ChatPage userId={2} />} />
         <Route path="/categoryPage/:categoryName" element={<CategoryPage />} />
+        <Route path="/About" element={<AboutPage />} />
       </Routes>
       <Footer />
     </Router>
