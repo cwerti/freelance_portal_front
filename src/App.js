@@ -27,7 +27,7 @@ function App() {
         <Route path="/profile/:id" element={<Profile />} /> {/* маршрут */}
         <Route path="/profile" element={<Profile />} /> {/* маршрут */}
         <Route path="/create-project" element={<CreateProject />} />
-        <Route path="/project/:id" element={<ProjectDetails />} />
+        <Route path="/project/:orderId" element={<ProjectDetails />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/chats" element={<Chats userId={2} />} />
         <Route path="/chat/:chatId" element={<ChatPage userId={2} />} />

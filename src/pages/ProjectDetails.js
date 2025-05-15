@@ -1,149 +1,217 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode'; // Для декодирования токена
-import '../styles/ProjectDetails.css';
-import defaultImage from '../images/img2.jpg'; // Статический fallback для изображения
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode"; 
+import "../styles/Profile.css";
 
-const ProjectDetails = () => {
-  const { orderId } = useParams();  // Получаем ID ордера из URL
-  const [orderData, setOrderData] = useState(null);
-  const [image, setImage] = useState(null); // Для аватарки проекта
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isCreator, setIsCreator] = useState(false); // Флаг для проверки, является ли пользователь создателем
+const Profile = () => {
+  const [userData, setUserData] = useState(null); // Для данных пользователя
+  const [orders, setOrders] = useState([]);  // Для ордеров
+  const [reviews, setReviews] = useState([]); // Для отзывов
+  const [loading, setLoading] = useState(true); // Убедимся, что это состояние контролируется
+  const [error, setError] = useState("");
+  const { id } = useParams();  // Получаем ID пользователя из URL
   const navigate = useNavigate();
 
-  // Получаем авторизованный токен
+  // Пример сопоставления ID роли с текстом
+  const roleNames = {
+    1: 'Заказчик',
+    2: 'Фрилансер',
+    3: 'Менеджер',
+    4: 'Модератор',
+  };
+
+  useEffect(() => {
+    const token = getCookie("access_token"); // Получаем токен из cookies
+
+    if (!token) {
+      console.log("Токен не найден, перенаправляем на страницу логина.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const decodedToken = jwtDecode(token); 
+      console.log("Decoded Token:", decodedToken);  // Печатаем токен
+      console.log("User ID from URL:", id);  // Печатаем ID из URL
+
+      if (parseInt(decodedToken.id, 10) !== parseInt(id, 10)) {
+        console.log("Неверный ID пользователя. Перенаправляем на страницу логина.");
+        setError("Неверный ID пользователя.");
+        navigate("/login");
+        return;
+      }
+
+      fetchUserData(id, token);  // Запрос на получение данных пользователя
+      fetchOrders(id, token);    // Запрос на получение ордеров
+      fetchReviews(id, token);   // Запрос на получение отзывов
+    } catch (error) {
+      console.log("Ошибка при декодировании токена:", error);
+      setError("Ошибка при декодировании токена.");
+      navigate("/login");
+    }
+  }, [id, navigate]);
+
+  const fetchUserData = async (userId, token) => {
+    try {
+      const response = await fetch(`http://localhost:8000/user/${userId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Данные пользователя:", data);  // Логируем данные пользователя
+        setUserData(data);
+      } else {
+        console.error("Ошибка при получении данных пользователя:", response);
+        setError("Не удалось загрузить данные пользователя");
+      }
+    } catch (err) {
+      console.error("Ошибка при запросе данных пользователя:", err);
+      setError("Ошибка при загрузке данных");
+    }
+  };
+
+  const fetchOrders = async (userId, token) => {
+    try {
+      const response = await fetch(`http://localhost:8000/orders/by-author/${userId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Ордера:", data);  // Логируем ордера
+        setOrders(data);
+      } else {
+        console.error("Ошибка при получении ордеров:", response);
+        setError("Не удалось загрузить ордера");
+      }
+    } catch (err) {
+      console.error("Ошибка при запросе ордеров:", err);
+      setError("Ошибка при загрузке ордеров");
+    }
+  };
+
+  const fetchReviews = async (userId, token) => {
+    try {
+      const response = await fetch(`http://localhost:8000/reviews/user/${userId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Отзывы:", data);  // Логируем отзывы
+        setReviews(data);
+      } else {
+        console.error("Ошибка при получении отзывов:", response);
+        setError("Не удалось загрузить отзывы");
+      }
+    } catch (err) {
+      console.error("Ошибка при запросе отзывов:", err);
+      setError("Ошибка при загрузке отзывов");
+    }
+  };
+
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
 
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    if (parts.length === 2) return parts.pop().split(";").shift();
     return null;
   };
 
-  // Декодирование токена и проверка на создателя ордера
+  // Завершаем загрузку, если данные получены
   useEffect(() => {
-    const token = getCookie('access_token');
-
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    const decodedToken = jwtDecode(token);
-    fetchOrderData(orderId, token, decodedToken.id);
-  }, [orderId, navigate]);
-
-  // Функция для загрузки данных ордера
-  const fetchOrderData = async (orderId, token, userId) => {
-    try {
-      const response = await fetch(`http://localhost:8000/orders/by-order/${orderId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setOrderData(data);
-        setIsCreator(data.authorId === userId);  // Проверяем, является ли текущий пользователь создателем ордера
-      } else {
-        setError('Не удалось загрузить данные ордера');
-      }
-    } catch (err) {
-      setError('Ошибка при запросе данных ордера');
-    } finally {
+    if (userData && orders && reviews) {
       setLoading(false);
     }
-  };
+  }, [userData, orders, reviews]);
 
-  // Функция для удаления ордера
-  const deleteOrder = async () => {
-    const token = getCookie('access_token');
-    try {
-      const response = await fetch(`http://localhost:8000/orders/${orderId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        navigate('/orders'); // Перенаправляем на страницу ордеров
-      } else {
-        setError('Не удалось удалить ордер');
-      }
-    } catch (err) {
-      setError('Ошибка при удалении ордера');
-    }
-  };
-
-  // Функция для добавления аватарки
-  const handleImageUpload = async (e) => {
-    const formData = new FormData();
-    formData.append('file', e.target.files[0]);
-
-    const token = getCookie('access_token');
-    try {
-      const response = await fetch(`http://localhost:8000/orders/update/${orderId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setImage(data.avatar); // Обновляем аватарку
-      } else {
-        setError('Ошибка при загрузке аватарки');
-      }
-    } catch (err) {
-      setError('Ошибка при загрузке аватарки');
-    }
-  };
-
-  // Отображение при загрузке или ошибке
   if (loading) return <div>Загрузка...</div>;
+
   if (error) return <div className="error">{error}</div>;
 
-  // Отображаем детали ордера
+  // Используем сопоставление роли для отображения названия роли
+  const roleText = roleNames[userData.role_id] || "Неизвестная роль";
+
   return (
-    <div className="project-details-container">
-      <h2>Детали проекта</h2>
-      <div className="project-info">
-        <h3>{orderData.name}</h3>
-        <div className="project-item">
-          <img src={image || defaultImage} className="project-image" alt="Project" />
-          {isCreator && (
-            <div>
-              <input type="file" onChange={handleImageUpload} />
-              <p>Загрузить аватарку</p>
-            </div>
-          )}
-        </div>
-        <p><strong>Категория:</strong> {orderData.categoryId === 1 ? 'IT' : orderData.categoryId === 2 ? 'Design' : 'Marketing'}</p>
-        <p><strong>Бюджет:</strong> {orderData.startPrice}₽</p>
-        <p><strong>Описание:</strong> {orderData.description}</p>
-        <p><strong>Дата завершения:</strong> {new Date(orderData.deadline).toLocaleString()}</p>
+    <div className="profile-container">
+      <div className="profile-header">
+        <h2>Мой Профиль</h2>
+        <p className="profile-role">Роль: {roleText}</p> {/* Отображаем название роли */}
       </div>
 
-      {/* Функционал для удаления ордера */}
-      {isCreator && (
-        <div>
-          <button onClick={deleteOrder}>Удалить ордер</button>
+      <div className="profile-info">
+        <div className="profile-avatar">
+          <img
+            src={userData.avatar || "default-avatar.png"}  
+            alt="Avatar"
+            className="avatar"
+          />
         </div>
-      )}
 
-      {/* Функция отклика */}
-      <button>Откликнуться</button>
+        <div className="profile-details">
+          <p><strong>Логин:</strong> {userData.login}</p>
+          <p><strong>Имя:</strong> {userData.first_name}</p>
+          <p><strong>Фамилия:</strong> {userData.last_name}</p>
+          <p><strong>Email:</strong> {userData.email}</p>
+          <p><strong>Дата регистрации:</strong> {new Date(userData.created_at).toLocaleDateString()}</p>
+        </div>
+      </div>
+
+      <div className="profile-actions">
+        <button className="edit-profile-btn">Редактировать профиль</button>
+      </div>
+
+      {/* Раздел с ордерами */}
+      <div className="orders-section">
+        <h3>Ордера</h3>
+        <div className="orders-list">
+          {orders.length === 0 ? (
+            <p>Ордера не найдены.</p>
+          ) : (
+            orders.map((order) => (
+              <div key={order.id} className="order-card">
+                <h4>{order.name}</h4>
+                <p><strong>Категория:</strong> {order.category_id}</p>
+                <p><strong>Бюджет:</strong> {order.start_price}₽</p>
+                <p><strong>Описание:</strong> {order.description}</p>
+                {/* Добавьте здесь кнопки для редактирования и удаления ордера */}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Раздел с отзывами */}
+      <div className="reviews-section">
+        <h3>Отзывы</h3>
+        <div className="reviews-list">
+          {reviews.length === 0 ? (
+            <p>Отзывов пока нет.</p>
+          ) : (
+            reviews.map((review) => (
+              <div key={review.id} className="review-card">
+                <p><strong>Отзыв от:</strong> {review.reviewer_name}</p>
+                <p>{review.content}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default ProjectDetails;
+export default Profile;
