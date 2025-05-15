@@ -10,8 +10,11 @@ const Profile = () => {
   const { id } = useParams();  // Получаем ID пользователя из URL
   const navigate = useNavigate();
 
+  
   useEffect(() => {
-    const token = getCookie("token"); // Получаем токен из cookies
+    const token = getCookie("access_token"); // Получаем токен из cookies
+    console.log(token);
+
 
     if (!token) {
       // Если токен отсутствует, перенаправляем на страницу логина
@@ -21,8 +24,10 @@ const Profile = () => {
 
     try {
       // Декодируем токен и проверяем ID пользователя
-      const decodedToken = jwt_decode(token);
-      if (decodedToken.sub !== id) {
+      const decodedToken = jwtDecode(token);
+      
+      if ('' + decodedToken.id !== id) {
+
         setError("Неверный ID пользователя.");
         navigate("/login");
         return;
@@ -40,14 +45,18 @@ const Profile = () => {
     try {
       const response = await fetch(`http://localhost:8000/user/${userId}`, {
         method: "GET",
+
+        credentials: "include",
+
         headers: {
           "Authorization": `Bearer ${token}`,
         },
       });
-
+      console.log(response)
       if (response.ok) {
         const data = await response.json();
-        setUserData(data);  // Сохраняем данные пользователя
+        setUserData(data); 
+
       } else {
         setError("Не удалось загрузить данные пользователя");
       }
@@ -61,6 +70,8 @@ const Profile = () => {
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
+    console.log(parts);
+
     if (parts.length === 2) return parts.pop().split(";").shift();
     return null;
   };
@@ -73,7 +84,8 @@ const Profile = () => {
     <div className="profile-container">
       <div className="profile-header">
         <h2>Мой Профиль</h2>
-        <p className="profile-role">Роль: {userData.role}</p>
+        <p className="profile-role">Роль: {userData.role_id}</p>
+
       </div>
 
       <div className="profile-info">

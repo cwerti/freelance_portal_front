@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Для перенаправления
+
+import { redirect, useNavigate } from "react-router-dom"; // Для перенаправления
+
 import "../styles/Login.css";
+import Header from "../components/Header";
 
 const Login = () => {
   const [login, setLogin] = useState("");  // Логин пользователя
@@ -22,9 +25,10 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        
-        // Если вход успешен, перенаправляем на главную страницу (или на страницу профиля)
-        navigate("/"); // Переход на главную страницу
+        addCookie("access_token", data[1], 3);
+
+        window.location.href = '/';
+
       } else {
         const errorData = await response.json();
         setError(errorData.detail || "Не удалось авторизоваться");
@@ -32,6 +36,14 @@ const Login = () => {
     } catch (error) {
       setError("Ошибка подключения к серверу");
     }
+  };
+
+  const addCookie = (name, value, days) => {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Время действия cookie
+    const expires = `expires=${date.toUTCString()}`;
+    console.log(name, value);
+    document.cookie = `${name}=${value}; ${expires}; path=/`; // Устанавливаем cookie
   };
 
   return (

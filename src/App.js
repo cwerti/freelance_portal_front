@@ -11,7 +11,10 @@ import AdminPanel from "./pages/AdminPanel";
 import Chats from "./pages/Chats";
 import ChatPage from "./pages/ChatPage";
 
+
 function App() {
+
+  
   return (
     <Router>
       <Header />
@@ -19,6 +22,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/profile/:id" element={<Profile />} /> {/* маршрут */}
         <Route path="/profile" element={<Profile />} /> {/* маршрут */}
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
