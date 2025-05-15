@@ -9,7 +9,7 @@ const Header = () => {
   const [userData, setUserData] = useState(null); // Для хранения данных пользователя
   const navigate = useNavigate();
   useEffect(() => {
-    console.log(document.cookie);
+    console.log("документ куки", document.cookie);
     const token = getCookie("access_token"); // Проверка наличия токена
     console.log(token);
     if (token) {
