@@ -19,7 +19,6 @@ const Header = () => {
         console.error("Ошибка при декодировании токена:", error);
       }
     }
-
   }, []);
 
   const fetchUserData = async (userId, token) => {
@@ -31,10 +30,10 @@ const Header = () => {
         },
         credentials: "include",
       });
-      
+
       if (response.ok) {
         const data = await response.json();
-        setUserData(data); // Сохраняем данные пользователя в состояние
+        setUserData(data);
       } else {
         console.error("Не удалось получить данные пользователя");
       }
@@ -58,15 +57,6 @@ const Header = () => {
     navigate("/login"); // Перенаправляем на страницу логина
   };
 
-  const handleProfile = () => {
-    navigate(`/profile/${userData.id}`);
-  };
-
-  const handleChats = () => {
-    // Здесь можно добавить логику для перехода в чат с использованием ID пользователя или других данных
-    navigate("/chats"); // Переход на страницу чатов
-  };
-
   return (
     <header className="header">
       <Link to="/" className="logo">
@@ -80,8 +70,15 @@ const Header = () => {
             {userData.firstName} {userData.lastName}
           </span>
           <button onClick={handleLogout} className="auth-btn">Выйти</button>
-          <button onClick={handleProfile} className="auth-btn">Профиль</button>
-          <button onClick={handleChats} className="auth-btn">Чаты</button> {/* Кнопка чатов */}
+          <Link to={`/profile/${userData.id}`}>
+            <button className="auth-btn">Профиль</button>
+          </Link>
+          <Link to="/chats">
+            <button className="auth-btn">Чаты</button> {/* Добавляем кнопку чатов */}
+          </Link>
+          <Link to="/create-project">
+            <button className="auth-btn create-btn">Создать ордер</button>
+          </Link>
         </div>
       ) : (
         <div className="auth-buttons">

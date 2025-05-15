@@ -1,39 +1,126 @@
+/* Основной контейнер для страницы создания ордера */
 .create-project-container {
-    padding: 40px;
-    background-color: #f5f5f5;
-    max-width: 600px;
-    margin: 0 auto;
-    min-height: 100vh;
-    border-radius: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .create-project-container h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  .project-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .project-form input,
-  .project-form textarea,
-  .project-form select {
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-  }
-  
-  .project-form button {
-    background-color: #edfcb4;
-    color: #111;
-    border: 1px solid #a3d363;
-    padding: 10px;
-    border-radius: 12px;
-    cursor: pointer;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: #f7f7f7;
+  min-height: 100vh;
+}
+
+/* Заголовок формы */
+.create-project-container h2 {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Форма для создания проекта */
+.create-project-form {
+  background-color: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Поля ввода, textarea и select */
+.create-project-form input,
+.create-project-form textarea,
+.create-project-form select {
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 15px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Фокус на полях формы */
+.create-project-form input:focus,
+.create-project-form textarea:focus,
+.create-project-form select:focus {
+  border-color: #45a049; /* Зеленый цвет при фокусе */
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);  /* Плавное выделение при фокусе */
+}
+
+/* Размеры для textarea */
+.create-project-form textarea {
+  resize: vertical;  /* Позволяет увеличивать только по вертикали */
+  min-height: 150px;
+}
+
+/* Кнопка "Создать ордер" */
+.create-project-form button {
+  padding: 12px 20px;
+  background-color: #45a049; /* Зеленый фон */
+  color: white;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  border: none;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Эффект при наведении на кнопку */
+.create-project-form button:hover {
+  background-color: #388e3c; /* Темный оттенок при наведении */
+  transform: translateY(-2px); /* Легкое поднятие кнопки */
+}
+
+/* Эффект при нажатии на кнопку */
+.create-project-form button:active {
+  background-color: #2c6e2f; /* Еще темнее при нажатии */
+  transform: translateY(1px); /* Кнопка немного "утопает" при нажатии */
+}
+
+/* Сообщение об ошибке */
+.error-message {
+  color: #f44336;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Стиль для выбора категории */
+.create-project-form select {
+  background-color: white;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 100%;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Дополнительные стили для улучшения внешнего вида */
+.create-project-form input::placeholder,
+.create-project-form textarea::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+/* Классы для более мелких полей ввода */
+.create-project-form input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  text-align: right;
+}
+
+/* Дополнительный стиль для лейблов */
+.create-project-form label {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}

@@ -108,3 +108,51 @@
 .error {
   color: #d9534f; /* Красный для ошибок */
 }
+
+/* Стили для отзывов */
+.reviews-section {
+  margin-top: 40px;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.review-card {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+}
+
+.review-card p {
+  margin: 5px 0;
+}
+
+/* Стили для ордеров */
+.orders-section {
+  margin-top: 40px;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-card {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+}
+
+.order-card h4 {
+  margin-bottom: 10px;
+}
+
+.order-card p {
+  margin: 5px 0;
+}

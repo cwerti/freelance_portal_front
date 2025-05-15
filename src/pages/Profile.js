@@ -5,6 +5,8 @@ import "../styles/Profile.css";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
+  const [orders, setOrders] = useState([]);  // Для ордеров
+  const [reviews, setReviews] = useState([]); // Для отзывов
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { id } = useParams();  // Получаем ID пользователя из URL
@@ -36,6 +38,8 @@ const Profile = () => {
       }
 
       fetchUserData(id, token);
+      fetchOrders(id, token); // Загрузка ордеров
+      fetchReviews(id, token); // Загрузка отзывов
     } catch (error) {
       setError("Ошибка при декодировании токена.");
       navigate("/login");
@@ -46,10 +50,10 @@ const Profile = () => {
     try {
       const response = await fetch(`http://localhost:8000/user/${userId}`, {
         method: "GET",
-        credentials: "include",
         headers: {
           "Authorization": `Bearer ${token}`,
         },
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -59,9 +63,48 @@ const Profile = () => {
         setError("Не удалось загрузить данные пользователя");
       }
     } catch (err) {
-      setError("Ошибка при загрузке данных");
-    } finally {
-      setLoading(false);
+      setError("Ошибка при загрузке данных пользователя");
+    }
+  };
+
+  const fetchOrders = async (userId, token) => {
+    try {
+      const response = await fetch(`http://localhost:8000/orders/by-author/${user_id}`, {
+        method: "GET",  // Используем GET метод
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setOrders(data);
+      } else {
+        setError("Не удалось загрузить ордера");
+      }
+    } catch (err) {
+      setError("Ошибка при загрузке ордеров");
+    }
+  };
+
+  const fetchReviews = async (userId, token) => {
+    try {
+      const response = await fetch(`http://localhost:8000/reviews/user/${userId}`, {
+        method: "GET",  // Используем GET метод
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setReviews(data);
+      } else {
+        setError("Не удалось загрузить отзывы");
+      }
+    } catch (err) {
+      setError("Ошибка при загрузке отзывов");
     }
   };
 
@@ -107,6 +150,41 @@ const Profile = () => {
 
       <div className="profile-actions">
         <button className="edit-profile-btn">Редактировать профиль</button>
+      </div>
+
+      {/* Раздел с отзывами */}
+      <div className="reviews-section">
+        <h3>Отзывы</h3>
+        <div className="reviews-list">
+          {reviews.length === 0 ? (
+            <p>Отзывов пока нет.</p>
+          ) : (
+            reviews.map((review) => (
+              <div key={review.id} className="review-card">
+                <p><strong>Отзыв от:</strong> {review.reviewer_name}</p>
+                <p>{review.content}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Раздел с ордерами */}
+      <div className="orders-section">
+        <h3>Ордера</h3>
+        <div className="orders-list">
+          {orders.length === 0 ? (
+            <p>Ордера не найдены.</p>
+          ) : (
+            orders.map((order) => (
+              <div key={order.id} className="order-card">
+                <h4>{order.title}</h4>
+                <p><strong>Описание:</strong> {order.description}</p>
+                <p><strong>Цена:</strong> {order.price}</p>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
