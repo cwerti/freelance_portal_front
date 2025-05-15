@@ -68,9 +68,6 @@ const Header = () => {
 
       {userData ? (
         <div className="user-info">
-          <Link to="/chats" className="auth-btn chat-btn">
-            Чаты
-          </Link>
           <span className="user-name">
             {userData.firstName} {userData.lastName}
           </span>
