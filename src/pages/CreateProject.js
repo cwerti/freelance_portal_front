@@ -6,7 +6,7 @@ import "../styles/CreateProject.css";
 const CreateProject = () => {
   const [name, setName] = useState("");              // Название проекта
   const [description, setDescription] = useState("");  // Описание проекта
-  const [category, setCategory] = useState(0);        // Категория проекта (целое число)
+  let [category, setCategory] = useState(0);        // Категория проекта (целое число)
   const [price, setPrice] = useState("");              // Цена
   const [deadline, setDeadline] = useState("");        // Дата завершения
   const [authorId, setAuthorId] = useState(null);      // AuthorId будет извлечен из токена
@@ -42,17 +42,21 @@ const CreateProject = () => {
       console.error("Не удалось получить authorId");
       return;
     }
-
+    if (category === 0){
+      category = 1;
+    }
+    
     // Создание объекта данных для отправки на сервер
     const projectData = {
-      authorId,  // Динамический authorId
-      name,
-      description,
-      startPrice: price,
-      deadline,  // Преобразуем дату в строку, если необходимо
-      categoryId: category, // ID категории (целое число)
-      statusId: 1, // Статус по умолчанию равен 1
+      "authorId":authorId,  // Динамический authorId
+      "name": name,
+      "description": description,
+      "startPrice": price,
+      "deadline": deadline,  // Преобразуем дату в строку, если необходимо
+      "categoryId": category, // ID категории (целое число)
+      "statusId": 1, // Статус по умолчанию равен 1
     };
+    console.log(category);
 
     try {
       const response = await fetch("http://localhost:8000/orders", {
