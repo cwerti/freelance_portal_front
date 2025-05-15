@@ -6,9 +6,9 @@
     justify-content: center;
     align-items: center;
     background-color: #f7f7f7;
-  }
-  
-  .register-form {
+}
+
+.register-form {
     background-color: white;
     padding: 30px 40px;
     border-radius: 12px;
@@ -18,47 +18,93 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-  }
-  
-  .register-form h2 {
+}
+
+.register-form h2 {
     text-align: center;
     margin-bottom: 12px;
     color: #333;
-  }
-  
-  .register-form input {
+}
+
+.register-form input,
+.register-form select {
     padding: 10px 12px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 16px;
-  }
-  
-  .register-form button {
+    width: 100%;
+    margin-bottom: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.register-form input:focus,
+.register-form select:focus {
+    border-color: #45a049; /* Зеленый при фокусе */
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.2); /* Плавное выделение */
+}
+
+/* Стиль для кнопки "Регистрация" */
+.register-btn {
     padding: 10px 12px;
-    background-color: #c5f36d;
+    background-color: white; /* Белый фон */
+    color: #45a049;  /* Зеленый текст */
+    border: 2px solid #45a049;  /* Зеленая граница */
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.register-btn:hover {
+    background-color: #45a049; /* Зеленый фон при наведении */
+    color: white; /* Белый текст при наведении */
+}
+
+/* Стиль для кнопки "Войти" */
+.login-btn {
+    padding: 10px 12px;
+    background-color: #45a049; /* Зеленый фон */
+    color: white; /* Белый текст */
     border: none;
     border-radius: 6px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
-  }
-  
-  .register-form button:hover {
-    background-color: #b3e75a;
-  }
-  
-  .login-link {
+}
+
+.login-btn:hover {
+    background-color: #388e3c; /* Темный зеленый оттенок при наведении */
+}
+
+/* Стили для ссылки на логин */
+.login-link {
     text-align: center;
     font-size: 14px;
-  }
-  
-  .login-link a {
+}
+
+.login-link a {
     color: #4f9aff;
     text-decoration: none;
-  }
-  
-  .login-link a:hover {
+}
+
+.login-link a:hover {
     text-decoration: underline;
-  }
-  
+}
+
+/* Дополнительный стиль для выборки роли */
+.register-form select {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    width: 100%;
+    background-color: white;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.register-form select:focus {
+    border-color: #45a049; /* Зеленый при фокусе */
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.2); /* Плавное выделение */
+}
