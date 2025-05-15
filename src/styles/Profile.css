@@ -1,48 +1,110 @@
+/* Общие стили для контейнера */
 .profile-container {
   font-family: 'Arial', sans-serif;
-  background-color: #ffffff;
+  background-color: #f5f5f5;  /* Светлый фон страницы */
   min-height: 100vh;
+  color: #333;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.profile-content {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 20px;
-}
-
-.profile-info {
-  background-color: #e0e0e0;
-  padding: 30px;
-  border-radius: 10px;
-  margin-bottom: 30px;
+.profile-header {
   text-align: center;
-  font-size: 18px;
-}
-
-.profile-section {
-  background-color: #dddddd;
-  padding: 25px;
-  border-radius: 10px;
   margin-bottom: 20px;
 }
 
-.profile-section.large {
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.profile-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #2b2b2b;
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.profile-role {
+  font-size: 16px;
+  color: #888;
 }
 
-.create-order-button {
-  background-color: white;
-  border: 2px solid #333;
-  padding: 6px 14px;
-  font-family: 'Courier New', Courier, monospace;
+.profile-info {
+  background-color: #ffffff;  /* Белый фон для информации */
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* Легкая тень */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 30px;
+}
+
+.profile-avatar {
+  flex: 1;
+  text-align: center;
+}
+
+.profile-avatar img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;  /* Обрезка изображения для аватара */
+  margin-bottom: 20px;
+}
+
+.profile-details {
+  flex: 3;
+  margin-left: 20px;
+}
+
+.profile-details p {
+  font-size: 18px;
+  margin: 8px 0;
+}
+
+.profile-details strong {
+  font-weight: 600;
+  color: #2b2b2b;
+}
+
+.profile-actions {
+  text-align: center;
+  width: 100%;
+  max-width: 900px;
+}
+
+.edit-profile-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 18px;
+  border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* Тень для кнопки */
+}
+
+.edit-profile-btn:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+.edit-profile-btn:focus {
+  outline: none;
+}
+
+/* Мелкие стили для ошибок и загрузки */
+.loading, .error {
+  text-align: center;
+  font-size: 20px;
+  color: #333;
+  margin-top: 20px;
+}
+
+.loading {
+  color: #5b9bd5; /* Цвет для текста загрузки */
+}
+
+.error {
+  color: #d9534f; /* Красный для ошибок */
 }

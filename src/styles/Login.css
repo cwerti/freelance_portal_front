@@ -6,9 +6,9 @@
     justify-content: center;
     align-items: center;
     background-color: #f7f7f7;
-  }
-  
-  .login-form {
+}
+
+.login-form {
     background-color: white;
     padding: 30px 40px;
     border-radius: 12px;
@@ -18,47 +18,49 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-  }
-  
-  .login-form h2 {
+}
+
+.login-form h2 {
     text-align: center;
     margin-bottom: 12px;
     color: #333;
-  }
-  
-  .login-form input {
+}
+
+.login-form input {
     padding: 10px 12px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 16px;
-  }
-  
-  .login-form button {
+}
+
+.login-form button {
     padding: 10px 12px;
-    background-color: #c5f36d;
-    border: none;
+    background-color: white; /* Белый фон */
+    color: #45a049;  /* Зеленый текст */
+    border: 2px solid #45a049;  /* Зеленая граница */
     border-radius: 6px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .login-form button:hover {
-    background-color: #b3e75a;
-  }
-  
-  .signup-link {
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.login-form button:hover {
+    background-color: #45a049; /* Зеленый фон при наведении */
+    color: white; /* Белый текст при наведении */
+}
+
+/* Стили для ссылки на регистрацию */
+.signup-link {
     text-align: center;
     font-size: 14px;
-  }
-  
-  .signup-link a {
+}
+
+.signup-link a {
     color: #4f9aff;
     text-decoration: none;
-  }
-  
-  .signup-link a:hover {
+}
+
+.signup-link a:hover {
     text-decoration: underline;
-  }
-  
+}
