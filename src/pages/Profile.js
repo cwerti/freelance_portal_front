@@ -10,7 +10,6 @@ const Profile = () => {
   const { id } = useParams();  // Получаем ID пользователя из URL
   const navigate = useNavigate();
 
-  
   // Пример сопоставления ID роли с текстом
   const roleNames = {
     1: 'Заказчик',
@@ -22,7 +21,6 @@ const Profile = () => {
   useEffect(() => {
     const token = getCookie("access_token"); // Получаем токен из cookies
 
-
     if (!token) {
       navigate("/login");
       return;
@@ -32,7 +30,6 @@ const Profile = () => {
       const decodedToken = jwtDecode(token);
 
       if ('' + decodedToken.id !== id) {
-
         setError("Неверный ID пользователя.");
         navigate("/login");
         return;
@@ -49,18 +46,15 @@ const Profile = () => {
     try {
       const response = await fetch(`http://localhost:8000/user/${userId}`, {
         method: "GET",
-
         credentials: "include",
-
         headers: {
           "Authorization": `Bearer ${token}`,
         },
       });
+
       if (response.ok) {
         const data = await response.json();
-
         setUserData(data);
-
       } else {
         setError("Не удалось загрузить данные пользователя");
       }
@@ -75,8 +69,6 @@ const Profile = () => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
 
-    console.log(parts);
-
     if (parts.length === 2) return parts.pop().split(";").shift();
     return null;
   };
@@ -85,16 +77,14 @@ const Profile = () => {
 
   if (error) return <div className="error">{error}</div>;
 
-  // Используем сопоставление роли
+  // Используем сопоставление роли для отображения названия роли
   const roleText = roleNames[userData.role_id] || "Неизвестная роль";
 
   return (
     <div className="profile-container">
       <div className="profile-header">
         <h2>Мой Профиль</h2>
-
-        <p className="profile-role">Роль: {userData.role_id}</p>
-
+        <p className="profile-role">Роль: {roleText}</p> {/* Отображаем название роли */}
       </div>
 
       <div className="profile-info">
@@ -108,10 +98,10 @@ const Profile = () => {
 
         <div className="profile-details">
           <p><strong>Логин:</strong> {userData.login}</p>
-          <p><strong>Имя:</strong> {userData.firstName}</p>
-          <p><strong>Фамилия:</strong> {userData.lastName}</p>
+          <p><strong>Имя:</strong> {userData.first_name}</p>
+          <p><strong>Фамилия:</strong> {userData.last_name}</p>
           <p><strong>Email:</strong> {userData.email}</p>
-          <p><strong>Дата регистрации:</strong> {new Date(userData.createdAt).toLocaleDateString()}</p>
+          <p><strong>Дата регистрации:</strong> {new Date(userData.created_at).toLocaleDateString()}</p>
         </div>
       </div>
 

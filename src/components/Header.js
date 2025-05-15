@@ -1,28 +1,20 @@
 import React, { useEffect, useState } from "react";
-
-import { Link, useNavigate, redirect } from "react-router-dom";
-
-import { jwtDecode } from "jwt-decode"; // Для декодирования токена
+import { Link, useNavigate } from "react-router-dom"; // Для перехода
+import { jwtDecode } from "jwt-decode"; 
 import "../styles/Header.css";
-
 
 const Header = () => {
   const [userData, setUserData] = useState(null); // Для хранения данных пользователя
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("документ куки", document.cookie);
     const token = getCookie("access_token"); // Проверка наличия токена
-    console.log(token);
 
     if (token) {
       try {
         // Декодируем токен и получаем информацию о пользователе
         const decodedToken = jwtDecode(token);
-        console.log("Декодированный токен:", decodedToken); // Логируем декодированный токен
-        // Получаем данные пользователя с сервера
         fetchUserData(decodedToken.id, token); // sub - это ID пользователя
-
       } catch (error) {
         console.error("Ошибка при декодировании токена:", error);
       }
@@ -30,19 +22,18 @@ const Header = () => {
 
   }, []);
 
-
   const fetchUserData = async (userId, token) => {
     try {
       const response = await fetch(`http://localhost:8000/user/${userId}`, {
         method: "GET",
-
-        credentials: "include"
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        credentials: "include",
       });
       
       if (response.ok) {
         const data = await response.json();
-        // console.log(data);
-
         setUserData(data); // Сохраняем данные пользователя в состояние
       } else {
         console.error("Не удалось получить данные пользователя");
@@ -56,7 +47,6 @@ const Header = () => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
 
-    console.log(parts);
     if (parts.length === 2) return parts.pop().split(";").shift();
     return null;
   };
@@ -68,12 +58,14 @@ const Header = () => {
     navigate("/login"); // Перенаправляем на страницу логина
   };
 
-
   const handleProfile = () => {
-    window.location.href = `/profile/${userData.id}`;
-  
+    navigate(`/profile/${userData.id}`);
+  };
 
-  }
+  const handleChats = () => {
+    // Здесь можно добавить логику для перехода в чат с использованием ID пользователя или других данных
+    navigate("/chats"); // Переход на страницу чатов
+  };
 
   return (
     <header className="header">
@@ -89,6 +81,7 @@ const Header = () => {
           </span>
           <button onClick={handleLogout} className="auth-btn">Выйти</button>
           <button onClick={handleProfile} className="auth-btn">Профиль</button>
+          <button onClick={handleChats} className="auth-btn">Чаты</button> {/* Кнопка чатов */}
         </div>
       ) : (
         <div className="auth-buttons">
