@@ -9,6 +9,7 @@ const Profile = () => {
   const [error, setError] = useState("");
   const { id } = useParams();  // Получаем ID пользователя из URL
   const navigate = useNavigate();
+
   
   // Пример сопоставления ID роли с текстом
   const roleNames = {
@@ -21,6 +22,7 @@ const Profile = () => {
   useEffect(() => {
     const token = getCookie("access_token"); // Получаем токен из cookies
 
+
     if (!token) {
       navigate("/login");
       return;
@@ -30,6 +32,7 @@ const Profile = () => {
       const decodedToken = jwtDecode(token);
 
       if ('' + decodedToken.id !== id) {
+
         setError("Неверный ID пользователя.");
         navigate("/login");
         return;
@@ -46,14 +49,18 @@ const Profile = () => {
     try {
       const response = await fetch(`http://localhost:8000/user/${userId}`, {
         method: "GET",
+
         credentials: "include",
+
         headers: {
           "Authorization": `Bearer ${token}`,
         },
       });
       if (response.ok) {
         const data = await response.json();
+
         setUserData(data);
+
       } else {
         setError("Не удалось загрузить данные пользователя");
       }
@@ -67,6 +74,9 @@ const Profile = () => {
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
+
+    console.log(parts);
+
     if (parts.length === 2) return parts.pop().split(";").shift();
     return null;
   };
@@ -82,7 +92,9 @@ const Profile = () => {
     <div className="profile-container">
       <div className="profile-header">
         <h2>Мой Профиль</h2>
-        <p className="profile-role">Роль: {roleText}</p> {/* Здесь отображаем название роли */}
+
+        <p className="profile-role">Роль: {userData.role_id}</p>
+
       </div>
 
       <div className="profile-info">

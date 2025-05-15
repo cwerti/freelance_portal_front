@@ -1,6 +1,7 @@
 import React from "react";
 import "../styles/Home.css";
-import { BlockList } from "../components/Blocks.jsx"
+import { BlockList } from "../components/Blocks.js"
+import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
@@ -20,10 +21,9 @@ const Home = () => {
         <div className="category-section">
           <h2>Категории</h2>
           <div className="category-list">
-            <div className="category-card">Дизайн</div>
-            <div className="category-card">Программирование</div>
-            <div className="category-card">Маркетинг</div>
-            <div className="category-card">Переводы</div>
+              <Link to="/category/Дизайн" className="category-card">Дизайн</Link>
+              <Link to="/category/Программирование" className="category-card">Программирование</Link>
+              <Link to="/category/Маркетинг" className="category-card">Маркетинг</Link>
           </div>
           <BlockList />
         </div>
