@@ -43,12 +43,12 @@ const CreateProject = () => {
       return;
     }
     if (category === 0){
-      category = 1;
+      category = 1; // Устанавливаем дефолтное значение категории, если оно не выбрано
     }
     
     // Создание объекта данных для отправки на сервер
     const projectData = {
-      "authorId":authorId,  // Динамический authorId
+      "authorId": authorId,  // Динамический authorId
       "name": name,
       "description": description,
       "startPrice": price,
@@ -56,7 +56,6 @@ const CreateProject = () => {
       "categoryId": category, // ID категории (целое число)
       "statusId": 1, // Статус по умолчанию равен 1
     };
-    console.log(category);
 
     try {
       const response = await fetch("http://localhost:8000/orders", {
@@ -68,7 +67,11 @@ const CreateProject = () => {
       });
 
       if (response.ok) {
-        navigate("/orders"); // Перенаправление на страницу ордеров
+        const data = await response.json(); // Получаем данные ордера, включая его ID
+        const orderId = data.id; // Предполагаем, что сервер возвращает ID созданного ордера
+
+        // После создания ордера, перенаправляем на страницу этого ордера
+        navigate(`/order/${orderId}`); // Перенаправляем на страницу ордера
       } else {
         console.error("Ошибка при создании ордера");
       }

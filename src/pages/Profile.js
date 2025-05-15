@@ -7,7 +7,7 @@ const Profile = () => {
   const [userData, setUserData] = useState(null);
   const [orders, setOrders] = useState([]);  // Для ордеров
   const [reviews, setReviews] = useState([]); // Для отзывов
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Убедимся, что это состояние контролируется
   const [error, setError] = useState("");
   const { id } = useParams();  // Получаем ID пользователя из URL
   const navigate = useNavigate();
@@ -24,14 +24,18 @@ const Profile = () => {
     const token = getCookie("access_token"); // Получаем токен из cookies
 
     if (!token) {
+      console.log("Токен не найден, перенаправляем на страницу логина.");
       navigate("/login");
       return;
     }
 
     try {
       const decodedToken = jwtDecode(token);
+      console.log("Decoded Token:", decodedToken);  // Печатаем токен
+      console.log("User ID from URL:", id);  // Печатаем ID из URL
 
-      if ('' + decodedToken.id !== id) {
+      if (parseInt(decodedToken.id, 10) !== parseInt(id, 10)) {
+        console.log("Неверный ID пользователя. Перенаправляем на страницу логина.");
         setError("Неверный ID пользователя.");
         navigate("/login");
         return;
@@ -41,6 +45,7 @@ const Profile = () => {
       fetchOrders(id, token); // Загрузка ордеров
       fetchReviews(id, token); // Загрузка отзывов
     } catch (error) {
+      console.log("Ошибка при декодировании токена:", error);
       setError("Ошибка при декодировании токена.");
       navigate("/login");
     }
@@ -48,6 +53,7 @@ const Profile = () => {
 
   const fetchUserData = async (userId, token) => {
     try {
+      console.log("Запрос данных пользователя...");
       const response = await fetch(`http://localhost:8000/user/${userId}`, {
         method: "GET",
         headers: {
@@ -58,39 +64,48 @@ const Profile = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Данные пользователя:", data);  // Логируем данные пользователя
         setUserData(data);
       } else {
+        console.error("Ошибка при получении данных пользователя:", response);
         setError("Не удалось загрузить данные пользователя");
       }
     } catch (err) {
-      setError("Ошибка при загрузке данных пользователя");
+      console.error("Ошибка при запросе данных пользователя:", err);
+      setError("Ошибка при загрузке данных");
     }
   };
 
   const fetchOrders = async (userId, token) => {
     try {
-      const response = await fetch(`http://localhost:8000/orders/by-author/${user_id}`, {
-        method: "GET",  // Используем GET метод
+      console.log("Запрос ордеров...");
+      const response = await fetch(`http://localhost:8000/orders/by-author/${userId}`, {
+        method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
         },
         credentials: "include",
       });
+
       if (response.ok) {
         const data = await response.json();
+        console.log("Ордера:", data);  // Логируем ордера
         setOrders(data);
       } else {
+        console.error("Ошибка при получении ордеров:", response);
         setError("Не удалось загрузить ордера");
       }
     } catch (err) {
+      console.error("Ошибка при запросе ордеров:", err);
       setError("Ошибка при загрузке ордеров");
     }
   };
 
   const fetchReviews = async (userId, token) => {
     try {
+      console.log("Запрос отзывов...");
       const response = await fetch(`http://localhost:8000/reviews/user/${userId}`, {
-        method: "GET",  // Используем GET метод
+        method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -99,11 +114,14 @@ const Profile = () => {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Отзывы:", data);  // Логируем отзывы
         setReviews(data);
       } else {
+        console.error("Ошибка при получении отзывов:", response);
         setError("Не удалось загрузить отзывы");
       }
     } catch (err) {
+      console.error("Ошибка при запросе отзывов:", err);
       setError("Ошибка при загрузке отзывов");
     }
   };
@@ -115,6 +133,13 @@ const Profile = () => {
     if (parts.length === 2) return parts.pop().split(";").shift();
     return null;
   };
+
+  // Убедимся, что loading меняется на false, когда данные загружены
+  useEffect(() => {
+    if (userData && orders && reviews) {
+      setLoading(false);
+    }
+  }, [userData, orders, reviews]);
 
   if (loading) return <div>Загрузка...</div>;
 
@@ -141,32 +166,15 @@ const Profile = () => {
 
         <div className="profile-details">
           <p><strong>Логин:</strong> {userData.login}</p>
-          <p><strong>Имя:</strong> {userData.first_name}</p>
-          <p><strong>Фамилия:</strong> {userData.last_name}</p>
+          <p><strong>Имя:</strong> {userData.firstName}</p>
+          <p><strong>Фамилия:</strong> {userData.lastName}</p>
           <p><strong>Email:</strong> {userData.email}</p>
-          <p><strong>Дата регистрации:</strong> {new Date(userData.created_at).toLocaleDateString()}</p>
+          <p><strong>Дата регистрации:</strong> {new Date(userData.createdAt).toLocaleDateString()}</p>
         </div>
       </div>
 
       <div className="profile-actions">
         <button className="edit-profile-btn">Редактировать профиль</button>
-      </div>
-
-      {/* Раздел с отзывами */}
-      <div className="reviews-section">
-        <h3>Отзывы</h3>
-        <div className="reviews-list">
-          {reviews.length === 0 ? (
-            <p>Отзывов пока нет.</p>
-          ) : (
-            reviews.map((review) => (
-              <div key={review.id} className="review-card">
-                <p><strong>Отзыв от:</strong> {review.reviewer_name}</p>
-                <p>{review.content}</p>
-              </div>
-            ))
-          )}
-        </div>
       </div>
 
       {/* Раздел с ордерами */}
@@ -181,6 +189,23 @@ const Profile = () => {
                 <h4>{order.title}</h4>
                 <p><strong>Описание:</strong> {order.description}</p>
                 <p><strong>Цена:</strong> {order.price}</p>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Раздел с отзывами */}
+      <div className="reviews-section">
+        <h3>Отзывы</h3>
+        <div className="reviews-list">
+          {reviews.length === 0 ? (
+            <p>Отзывов пока нет.</p>
+          ) : (
+            reviews.map((review) => (
+              <div key={review.id} className="review-card">
+                <p><strong>Отзыв от:</strong> {review.reviewer_name}</p>
+                <p>{review.content}</p>
               </div>
             ))
           )}
