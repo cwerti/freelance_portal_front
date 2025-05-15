@@ -10,6 +10,7 @@ import ProjectDetails from './pages/ProjectDetails';
 import AdminPanel from "./pages/AdminPanel";
 import Chats from "./pages/Chats";
 import ChatPage from "./pages/ChatPage";
+import CategoryPage from "./pages/CategoryPage";
 
 function App() {
   return (
@@ -23,8 +24,9 @@ function App() {
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/chats" element={<Chats userId={3} />} />
-        <Route path="/chat/:chatId" element={<ChatPage userId={3} />} />
+        <Route path="/chats" element={<Chats userId={2} />} />
+        <Route path="/chat/:chatId" element={<ChatPage userId={2} />} />
+        <Route path="/categoryPage/:categoryName" element={<CategoryPage />} />
       </Routes>
       <Footer />
     </Router>
