@@ -1,0 +1,183 @@
+/* Основной контейнер для страницы "О нас" */
+.about-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: #f7f7f7;
+  min-height: 100vh;
+}
+
+/* Заголовок страницы */
+.about-page-container h2 {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Секция с информацией о компании */
+.about-info {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Подзаголовок */
+.about-info h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Текст внутри секции */
+.about-info p {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #555;
+  text-align: justify;
+}
+
+/* Секция с командой */
+.team-section {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 40px;
+}
+
+/* Заголовок для команды */
+.team-section h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Контейнер для карточек с членами команды */
+.team-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Карточка члена команды */
+.team-member-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 220px;
+  text-align: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.team-member-card:hover {
+  transform: scale(1.05);
+}
+
+/* Аватар члена команды */
+.team-member-card img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+/* Имя члена команды */
+.team-member-card h4 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Должность члена команды */
+.team-member-card p {
+  font-size: 14px;
+  color: #777;
+}
+
+/* Секция для контактов */
+.contact-section {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 40px;
+}
+
+.contact-section h3 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.contact-section p {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Кнопка обратной связи */
+.contact-section button {
+  padding: 12px 24px;
+  background-color: #45a049;
+  color: white;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 20px;
+}
+
+.contact-section button:hover {
+  background-color: #388e3c;
+  transform: translateY(-2px);
+}
+
+.contact-section button:active {
+  background-color: #2c6e2f;
+  transform: translateY(1px);
+}
+
+/* Мобильная версия */
+@media (max-width: 768px) {
+  .about-page-container {
+    padding: 20px;
+  }
+
+  .about-info, .team-section, .contact-section {
+    padding: 20px;
+  }
+
+  .team-members {
+    flex-direction: column;
+  }
+
+  .team-member-card {
+    width: 100%;
+  }
+}

@@ -108,3 +108,42 @@
 .error {
   color: #d9534f; /* Красный для ошибок */
 }
+
+/* Стили для ордеров и отзывов на одном уровне */
+.orders-reviews-section {
+  display: flex;
+  flex-wrap: wrap;  /* Позволяет элементам переноситься на новую строку при необходимости */
+  justify-content: space-between;  /* Равномерно распределяет пространство между ордерами и отзывами */
+  gap: 20px;
+  margin-top: 40px;
+  width: 100%;
+  max-width: 900px;  /* Ограничение ширины */
+}
+
+.orders-list,
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;  /* Каждая из колонок занимает одинаковое пространство */
+}
+
+.order-card,
+.review-card {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.order-card h4,
+.review-card p {
+  margin-bottom: 10px;
+}
+
+.order-card p,
+.review-card p {
+  margin: 5px 0;
+}
+
