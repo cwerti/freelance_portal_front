@@ -9,7 +9,7 @@ import CreateProject from './pages/CreateProject';
 import ProjectDetails from './pages/ProjectDetails';
 import AdminPanel from "./pages/AdminPanel";
 import Chats from "./pages/Chats";
-
+import Chat from "./pages/Chat";
 
 function App() {
   return (
@@ -23,7 +23,8 @@ function App() {
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/Chats" element={<Chats />} />
+        <Route path="/Chats" element={<Chats  userId={1}/>}  />
+        <Route path="/Chat" element={<Chat />}  />
       </Routes>
       <Footer />
     </Router>
