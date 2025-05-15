@@ -1,115 +1,191 @@
-/* Основной контейнер для страницы создания ордера */
+/* Стили для страницы создания ордера */
 .create-project-container {
-  padding: 40px;
-    background-color: #f5f5f5;
-    max-width: 600px;
-    margin: 0 auto;
-  min-height: 100vh;
-    border-radius: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 40px 30px;
+  background: linear-gradient(145deg, #ffffff, #f8f8f8);
+  max-width: 680px;
+  margin: 80px auto 40px; /* Отступы от header и footer */
+  border-radius: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  transform: translateZ(0);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  box-sizing: border-box; /* Добавляем это */
+  padding: 40px 30px; /* Уменьшаем боковые отступы */
+}
+
+.create-project-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(69, 160, 73, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.create-project-container:hover {
+  transform: translateY(-2px);
 }
 
 .create-project-container h2 {
   text-align: center;
-    margin-bottom: 20px;
-    color: #333;
+  margin: 0 0 30px;
+  color: #2c3e50;
+  font-size: 2.2rem;
+  position: relative;
+  padding-bottom: 15px;
 }
 
-  .project-form {
+.create-project-container h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: #45a049;
+  border-radius: 2px;
+}
+
+.project-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 25px;
 }
 
-/* Поля ввода, textarea и select */
+/* Поля ввода */
 .create-project-form input,
 .create-project-form textarea,
 .create-project-form select {
-  padding: 12px 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  padding: 14px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
   font-size: 16px;
   width: 100%;
-  margin-bottom: 15px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  font-family: 'Arial', sans-serif;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.9);
+  font-family: 'Poppins', sans-serif;
+  width: calc(100% - 4px); /* Учитываем ширину границы */
+  box-sizing: border-box; /* Важное добавление */
 }
 
-/* Фокус на полях формы */
 .create-project-form input:focus,
 .create-project-form textarea:focus,
 .create-project-form select:focus {
-  border-color: #45a049; /* Зеленый цвет при фокусе */
-  box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);  /* Плавное выделение при фокусе */
+  border-color: #45a049;
+  box-shadow: 0 6px 20px rgba(69, 160, 73, 0.15);
+  background: white;
+  outline: none;
 }
 
-/* Размеры для textarea */
-.create-project-form textarea {
-  resize: vertical;  /* Позволяет увеличивать только по вертикали */
-  min-height: 150px;
-}
-
-/* Кнопка "Создать ордер" */
-.create-project-form button {
-  padding: 12px 20px;
-  background-color: #45a049; /* Зеленый фон */
-  color: white;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  border: none;
-  font-family: 'Arial', sans-serif;
-}
-
-/* Эффект при наведении на кнопку */
-.create-project-form button:hover {
-  background-color: #388e3c; /* Темный оттенок при наведении */
-  transform: translateY(-2px); /* Легкое поднятие кнопки */
-}
-
-/* Эффект при нажатии на кнопку */
-.create-project-form button:active {
-  background-color: #2c6e2f; /* Еще темнее при нажатии */
-  transform: translateY(1px); /* Кнопка немного "утопает" при нажатии */
-}
-
-/* Сообщение об ошибке */
-.error-message {
-  color: #f44336;
-  font-size: 14px;
-  text-align: center;
-  margin-top: 10px;
-}
-
-/* Стиль для выбора категории */
-.create-project-form select {
-  background-color: white;
-  border-radius: 8px;
-  font-size: 16px;
-  width: 100%;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Дополнительные стили для улучшения внешнего вида */
+/* Кастомные плейсхолдеры */
 .create-project-form input::placeholder,
 .create-project-form textarea::placeholder {
-  color: #999;
-  font-style: italic;
+  color: #a0a0a0;
+  font-weight: 300;
 }
 
-/* Классы для более мелких полей ввода */
-.create-project-form input[type="number"] {
-  -moz-appearance: textfield;
-  appearance: textfield;
-  text-align: right;
+/* Текстовое поле */
+.create-project-form textarea {
+  min-height: 140px;
+  line-height: 1.6;
+  resize: vertical;
+  padding: 16px 20px;
 }
 
-/* Дополнительный стиль для лейблов */
-.create-project-form label {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #333;
+/* Выпадающий список */
+.create-project-form select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2345a049'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 18px;
+}
+
+/* Кнопка отправки */
+.create-project-form button {
+  padding: 16px 30px;
+  background: linear-gradient(135deg, #45a049, #3a803d);
+  color: white;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.create-project-form button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.create-project-form button:hover {
+  box-shadow: 0 8px 25px rgba(69, 160, 73, 0.3);
+  transform: translateY(-2px);
+}
+
+.create-project-form button:hover::before {
+  left: 100%;
+}
+
+.create-project-form button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(69, 160, 73, 0.2);
+}
+
+/* Анимация ошибки */
+.error-message {
+  color: #e53935;
+  font-size: 14px;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(229, 57, 53, 0.05);
+  margin: 15px 0;
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  50% { transform: translateX(8px); }
+  75% { transform: translateX(-8px); }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .create-project-container {
+    margin: 60px 15px 30px;
+    padding: 30px 20px;
+    border-radius: 16px;
+  }
+  
+  .create-project-container h2 {
+    font-size: 1.8rem;
+  }
+  
+  .create-project-form button {
+    font-size: 1rem;
+    padding: 14px 25px;
+  }
 }
