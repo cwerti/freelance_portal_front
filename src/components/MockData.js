@@ -28,20 +28,19 @@ export const mockChats = [
 ];
 
 export const mockMessages = [
-  // Существующие сообщения
 {
-    id: 4,
+    id: 1,
     chatId: 2,
     senderId: 3,
-    text: "Жду документы к обеду",
-    time: "2024-02-20T14:45:00"
+    text: "Привет! Как дела?",
+    time: "2024-02-20T14:40:00"
 },
 {
-    id: 5,
+    id: 2,
     chatId: 2,
     senderId: 2,
-    text: "Отправляю вам файлы",
-    time: "2024-02-20T14:50:00"
+    text: "Всё хорошо, спасибо!",
+    time: "2024-02-20T14:42:00"
 },
 {
     id: 6,

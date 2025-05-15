@@ -30,6 +30,7 @@ function App() {
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/chats" element={<Chats />} />
+        <Route path="/ChatPage" element={<ChatPage />} />
         <Route path="/chat/:chatId" element={<ChatPage />} />
         <Route path="/category/:categoryName" element={<CategoryPage />} />
         <Route path="/About" element={<AboutPage />} />
