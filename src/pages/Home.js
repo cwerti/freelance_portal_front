@@ -21,6 +21,7 @@ const Home = () => {
         <div className="category-section">
           <h2>Категории</h2>
           <div className="category-list">
+              <i class="fas fa-seedling"></i>
               <Link to="/category/Дизайн" className="category-card">Дизайн</Link>
               <Link to="/category/Программирование" className="category-card">Программирование</Link>
               <Link to="/category/Маркетинг" className="category-card">Маркетинг</Link>
