@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, redirect } from "react-router-dom";
 
 import { jwtDecode } from "jwt-decode"; // Для декодирования токена
 import "../styles/Header.css";
-import { redirect, useNavigate } from "react-router-dom"; // Для перенаправления
 
 
 const Header = () => {
