@@ -96,13 +96,14 @@ const Register = () => {
           value={roleId}
           onChange={(e) => setRoleId(Number(e.target.value))}
         >
-          <option value={1}>Роль 1</option>
-          <option value={2}>Роль 2</option>
+          <option value={1}>Заказчик</option>
+          <option value={2}>Фрилансер</option>
           {/* Добавьте другие роли по необходимости */}
         </select>
 
-        {error && <p className="error">{error}</p>}
-        {success && <p className="success">{success}</p>}
+{error && <p className="error">{typeof error === 'object' ? error.message || JSON.stringify(error) : error}</p>}
+{success && <p className="success">{typeof success === 'object' ? success.message || JSON.stringify(success) : success}</p>}
+
 
         <button type="submit">Зарегистрироваться</button>
       </form>

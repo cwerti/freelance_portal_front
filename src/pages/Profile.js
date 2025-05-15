@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // Правильный импорт
+import { jwtDecode } from "jwt-decode"; 
 import "../styles/Profile.css";
 
 const Profile = () => {
@@ -10,30 +10,32 @@ const Profile = () => {
   const { id } = useParams();  // Получаем ID пользователя из URL
   const navigate = useNavigate();
   
+  // Пример сопоставления ID роли с текстом
+  const roleNames = {
+    1: 'Заказчик',
+    2: 'Фрилансер',
+  };
+
   useEffect(() => {
     const token = getCookie("access_token"); // Получаем токен из cookies
-    console.log(token);
 
     if (!token) {
-      // Если токен отсутствует, перенаправляем на страницу логина
       navigate("/login");
       return;
     }
 
     try {
-      // Декодируем токен и проверяем ID пользователя
       const decodedToken = jwtDecode(token);
-      
+
       if ('' + decodedToken.id !== id) {
         setError("Неверный ID пользователя.");
         navigate("/login");
         return;
       }
 
-      // Запрашиваем данные пользователя с сервера
       fetchUserData(id, token);
     } catch (error) {
-      console.error("Ошибка при декодировании токена:", error);
+      setError("Ошибка при декодировании токена.");
       navigate("/login");
     }
   }, [id, navigate]);
@@ -47,10 +49,9 @@ const Profile = () => {
           "Authorization": `Bearer ${token}`,
         },
       });
-      console.log(response)
       if (response.ok) {
         const data = await response.json();
-        setUserData(data); 
+        setUserData(data);
       } else {
         setError("Не удалось загрузить данные пользователя");
       }
@@ -64,7 +65,6 @@ const Profile = () => {
   const getCookie = (name) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    console.log(parts);
     if (parts.length === 2) return parts.pop().split(";").shift();
     return null;
   };
@@ -73,17 +73,20 @@ const Profile = () => {
 
   if (error) return <div className="error">{error}</div>;
 
+  // Используем сопоставление роли
+  const roleText = roleNames[userData.role_id] || "Неизвестная роль";
+
   return (
     <div className="profile-container">
       <div className="profile-header">
         <h2>Мой Профиль</h2>
-        <p className="profile-role">Роль: {userData.role_id}</p>
+        <p className="profile-role">Роль: {roleText}</p> {/* Здесь отображаем название роли */}
       </div>
 
       <div className="profile-info">
         <div className="profile-avatar">
           <img
-            src={userData.avatar || "default-avatar.png"}  // Показываем аватарку или изображение по умолчанию
+            src={userData.avatar || "default-avatar.png"}  
             alt="Avatar"
             className="avatar"
           />
@@ -91,10 +94,10 @@ const Profile = () => {
 
         <div className="profile-details">
           <p><strong>Логин:</strong> {userData.login}</p>
-          <p><strong>Имя:</strong> {userData.firstName}</p>
-          <p><strong>Фамилия:</strong> {userData.lastName}</p>
+          <p><strong>Имя:</strong> {userData.first_name}</p>
+          <p><strong>Фамилия:</strong> {userData.last_name}</p>
           <p><strong>Email:</strong> {userData.email}</p>
-          <p><strong>Дата регистрации:</strong> {new Date(userData.createdAt).toLocaleDateString()}</p>
+          <p><strong>Дата регистрации:</strong> {new Date(userData.created_at).toLocaleDateString()}</p>
         </div>
       </div>
 

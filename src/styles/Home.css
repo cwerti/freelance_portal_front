@@ -63,14 +63,14 @@
 .search-input {
   width: 300px;
   padding: 10px;
-  border: 2px solid #c4e56d;
+  border: 2px solid #45a049;
   border-radius: 4px 0 0 4px;
   outline: none;
 }
 
 .search-button {
-  background-color: #c4e56d;
-  border: 2px solid #c4e56d;
+  background-color: #45a049;
+  border: 2px solid #45a049;
   color: #000;
   padding: 10px 20px;
   border-radius: 0 4px 4px 0;
@@ -102,5 +102,5 @@
 }
 
 .category-card:hover {
-  background-color: #c4e56d;
+  background-color: #45a049;
 }

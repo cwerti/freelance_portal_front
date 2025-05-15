@@ -10,12 +10,12 @@
   font-weight: bold;
   font-size: 22px;
   font-family: 'Courier New', Courier, monospace;
-  background-color: #f5ffc9;
+  background-color: #45a049;
   padding: 8px 16px;
   border: 2px solid #3ea2ff;
   border-radius: 25px;
   text-decoration: none;
-  color: black;
+  color: rgb(255, 255, 255);
   display: flex;
   align-items: center;
   gap: 2px;
@@ -34,7 +34,7 @@
 }
 
 .search-container button {
-  background-color: #e4ff9f;
+  background-color: #45a049;
   border: 1px solid #ccc;
   padding: 4px 8px;
   font-family: monospace;
@@ -47,7 +47,7 @@
 }
 
 .auth-btn {
-  background-color: #e4ff9f;
+  background-color: #45a049;
   border: none;
   padding: 6px 12px;
   font-family: monospace;
