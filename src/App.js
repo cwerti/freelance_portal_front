@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -9,7 +9,7 @@ import CreateProject from './pages/CreateProject';
 import ProjectDetails from './pages/ProjectDetails';
 import AdminPanel from "./pages/AdminPanel";
 import Chats from "./pages/Chats";
-import Chat from "./pages/Chat";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
   return (
@@ -23,8 +23,8 @@ function App() {
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
         <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/Chats" element={<Chats  userId={1}/>}  />
-        <Route path="/Chat" element={<Chat />}  />
+        <Route path="/chats" element={<Chats userId={3} />} />
+        <Route path="/chat/:chatId" element={<ChatPage userId={3} />} />
       </Routes>
       <Footer />
     </Router>

@@ -1,67 +1,54 @@
 import React from "react";
 import "../styles/Chats.css";
 import { useState, useEffect } from 'react';
-import Chat from './Chat';
+import { useNavigate } from 'react-router-dom';
+import { mockChats, mockMessages } from "../components/MockData.js"
 
-// Мок-данные для тестирования
-const mockChats = [
-{
-    id: 1,
-    participantName: "Иван Иванов",
-    lastMessageTime: "2024-02-20T15:30:00",
-    lastMessage: "Привет! Как дела?",
-    lastMessageSender: 2
-},
-{
-    id: 2,
-    participantName: "Мария Петрова",
-    lastMessageTime: "2024-02-20T14:45:00",
-    lastMessage: "Жду документы к обеду",
-    lastMessageSender: 3
-},
-{
-    id: 3,
-    participantName: "Алексей Смирнов",
-    lastMessageTime: "2024-02-20T12:15:00",
-    lastMessage: "Спасибо за помощь!",
-    lastMessageSender: 1
-}
-];
 
 const Chats = ({ userId = 2 }) => { // Значение по умолчанию для демонстрации
     const [chats, setChats] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeChat, setActiveChat] = useState(null);
+    const navigate = useNavigate();
 
 useEffect(() => {
     const fetchChats = async () => {
-        try {
-        
-        // Для теста можно раскомментировать ошибку
-        // throw new Error('Сервер не отвечает');
-        
-        // Используем мок-данные вместо реального запроса
-        setChats(mockChats.filter(chat => 
-            chat.lastMessageSender === userId || 
-            chat.participantId === userId
-        ));
-        } catch (err) {
-        setError(err.message);
-        } finally {
-        setLoading(false);
-        }
-    };
+    try {
+        // Обновляем чаты, добавляя последние сообщения из mockMessages
+        const updatedChats = mockChats
+        .filter(chat => chat.participants.includes(userId))
+        .map(chat => {
+            // Находим последнее сообщение для этого чата
+            const chatMessages = mockMessages.filter(m => m.chatId === chat.id);
+            const lastMessage = chatMessages[chatMessages.length - 1];
+            
+            return {
+            ...chat,
+            lastMessage: lastMessage?.text || '',
+            lastMessageSender: lastMessage?.senderId || null,
+            lastMessageTime: lastMessage?.time || chat.createdAt
+            };
+        });
 
-    if (userId) {
+        setChats(updatedChats);
+    } catch (err) {
+        setError(err.message);
+    } finally {
+        setLoading(false);
+    }
+};
+
+if (userId) {
     fetchChats();
     }
-}, [userId]);
+}, [userId, mockMessages]); // Добавляем зависимость от mockMessages
 
 const handleChatClick = (chatId) => {
-    setActiveChat(chatId);
-    console.log('Selected chat ID:', chatId);
+    navigate(`/chat/${chatId}`); // ✅ Отдельный обработчик
 };
+
+
 
 if (loading) {
     return <div className="chat-page-body">Загрузка чатов...</div>;
@@ -80,9 +67,9 @@ return (
             key={chat.id}
             onClick={() => handleChatClick(chat.id)}
             >
-            <div className="chat-conversation">
+            {/* <div className="chat-conversation">
                 {activeChat && <ChatBody chatId={activeChat} userId={userId} />}
-            </div>
+            </div> */}
             <div className="chat-info">
                 <div className="chat-header">
                 <h3 className="user-name">{chat.participantName}</h3>
