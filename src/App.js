@@ -11,6 +11,7 @@ import AdminPanel from "./pages/AdminPanel";
 import Chats from "./pages/Chats";
 import ChatPage from "./pages/ChatPage";
 import CategoryPage from "./pages/CategoryPage";
+import AboutPage from "./pages/AboutPage";
 
 
 function App() {
