@@ -17,22 +17,6 @@ const Chats = () => {
         return value ? value.split('=')[1] : null;
     };
 
-    useEffect(() => {
-        const token = getCookie("access_token");
-
-        if (!token) {
-            navigate("/login");
-            return;
-        }
-
-        try {
-            const decodedToken = jwtDecode(token);
-            setUserId(decodedToken.id);
-        } catch (error) {
-            setError("Ошибка при декодировании токена");
-            navigate("/login");
-        }
-    }, [navigate]);
 
 useEffect(() => {
     const fetchChats = async () => {
@@ -45,13 +29,9 @@ useEffect(() => {
             const currentUserId = decodedToken.id;
             
             // Формируем URL с ID пользователя
-            const response = await fetch(`http://localhost:8000/chats/${currentUserId}`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+            const response = await fetch(`http://localhost:8000/chats/get_my_chats`, {
+                method: 'POST',
+                credentials: 'include'
             });
 
             console.log("Статус ответа:", response.status);
@@ -96,15 +76,15 @@ useEffect(() => {
             <div className="chats-list">
                 {chats.map((chat) => (
                     <div
-                        className={`chat-card ${activeChat === chat.id ? 'active' : ''}`}
-                        key={chat.id}
-                        onClick={() => handleChatClick(chat.id)}
+                        className={`chat-card ${activeChat === chat.chat_association.chat_id ? 'active' : ''}`}
+                        key={chat.chat_association.chat_id}
+                        onClick={() => handleChatClick(chat.chat_association.chat_id)}
                     >
                         <div className="chat-info">
                             <div className="chat-header">
-                                <h3 className="user-name">{chat.participantName}</h3>
+                                <h3 className="user-name">{chat.companion.login}</h3>
                                 <span className="message-time">
-                                    {new Date(chat.lastMessageTime).toLocaleTimeString([], {
+                                    {new Date(chat.last_message.created_at).toLocaleTimeString([], {
                                         hour: '2-digit',
                                         minute: '2-digit'
                                     })}
@@ -112,10 +92,10 @@ useEffect(() => {
                             </div>
                             <div className="chat-preview">
                                 <p className="last-message">
-                                    {chat.lastMessageSender === userId ? (
+                                    {chat.last_message.author_id === userId ? (
                                         <span className="message-author">Вы: </span>
                                     ) : null}
-                                    {chat.lastMessage}
+                                    {chat.last_message.text}
                                 </p>
                             </div>
                         </div>

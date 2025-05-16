@@ -84,7 +84,6 @@ const Profile = () => {
         },
         credentials: "include",
       });
-
       if (response.ok) {
         const data = await response.json();
         const ordersWithCategoryNames = data.map(order => ({

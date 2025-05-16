@@ -28,7 +28,7 @@ useEffect(() => {
 const handleSendMessage = () => {
     if (newMessage.trim()) {
     const newMsg = {
-        id: messages.length + 1,
+        id: Date.now(),
         chatId: parseInt(chatId),
         senderId: userId,
         text: newMessage,
