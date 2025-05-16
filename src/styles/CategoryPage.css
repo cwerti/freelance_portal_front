@@ -163,3 +163,193 @@
     font-size: 0.85rem;
   }
 }
+
+.category-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.category-header {
+  margin-bottom: 30px;
+}
+
+.category-header h1 {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.filters-section {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.sort-filter,
+.price-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sort-filter select,
+.price-filter input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.price-filter input {
+  width: 100px;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.project-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.project-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.project-card-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #2c3e50;
+}
+
+.project-info {
+  margin-top: 15px;
+}
+
+.project-price {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #2c3e50;
+  margin-top: 10px;
+}
+
+.project-description {
+  color: #666;
+  margin: 10px 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-1 {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-2 {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.status-3 {
+  background-color: #e8eaf6;
+  color: #3f51b5;
+}
+
+.status-4 {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+@media (min-width: 768px) {
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .projects-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.error {
+  color: #c62828;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .category-page {
+    padding: 15px;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .sort-filter,
+  .price-filter {
+    width: 100%;
+  }
+
+  .sort-filter select {
+    width: 100%;
+  }
+
+  .price-filter {
+    flex-wrap: wrap;
+  }
+
+  .price-filter input {
+    flex: 1;
+  }
+
+  .project-card {
+    padding: 15px;
+  }
+
+  .project-card-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .status {
+    align-self: flex-start;
+  }
+}

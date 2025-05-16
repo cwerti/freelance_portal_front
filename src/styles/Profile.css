@@ -8,22 +8,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .profile-header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
 }
 
-.profile-header h2 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #2b2b2b;
+.profile-header h1 {
+  margin: 0;
+  color: #2c3e50;
 }
 
-.profile-role {
-  font-size: 16px;
-  color: #888;
+.role {
+  color: #666;
+  margin-top: 5px;
 }
 
 .profile-info {
@@ -94,130 +97,116 @@
 }
 
 /* Стили для заказов */
-.orders-section {
-  width: 100%;
-  max-width: 1200px;
-  margin-bottom: 30px;
+.orders-section, .reviews-section {
+  margin-bottom: 40px;
 }
 
-.orders-section h3, .reviews-section h3 {
-  font-size: 24px;
+.orders-section h2, .reviews-section h2 {
+  color: #2c3e50;
   margin-bottom: 20px;
-  color: #2b2b2b;
 }
 
 .orders-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
 }
 
 .order-card {
+  background: #ffffff;
+  border: 1px solid #eee;
+  border-radius: 8px;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.order-card h4 {
-  margin: 0 0 15px 0;
-  font-size: 20px;
-  color: #2b2b2b;
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #45a049;
 }
 
-.order-card p {
-  font-size: 16px;
-  margin: 5px 0;
-  color: #555;
+.order-card h3 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 18px;
+}
+
+.order-details {
+  color: #666;
+}
+
+.order-details p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.order-details strong {
+  color: #2c3e50;
 }
 
 /* Стили для отзывов */
-.reviews-section {
-  width: 100%;
-  max-width: 1200px;
-}
-
 .reviews-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  display: grid;
+  gap: 20px;
 }
 
 .review-card {
+  background: #ffffff;
+  border: 1px solid #eee;
+  border-radius: 8px;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .review-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-}
-
-.reviewer-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.reviewer-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
+  margin-bottom: 10px;
 }
 
 .reviewer-name {
-  font-weight: 600;
-  color: #2b2b2b;
-}
-
-.review-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
+  font-weight: 500;
+  color: #2c3e50;
 }
 
 .review-date {
-  color: #888;
+  color: #666;
   font-size: 14px;
 }
 
 .review-rating {
-  color: #ffc107;
-  font-size: 16px;
-}
-
-.review-content {
-  margin-top: 10px;
+  color: #f39c12;
+  margin-bottom: 10px;
 }
 
 .review-comment {
-  margin: 0;
-  line-height: 1.6;
-  color: #555;
-  white-space: pre-wrap;
+  color: #2c3e50;
+  line-height: 1.5;
 }
 
 /* Сообщения о загрузке и пустых списках */
-.loading, .empty-message {
+.loading {
   text-align: center;
   padding: 20px;
-  color: #888;
-  font-size: 16px;
+  color: #666;
 }
 
 .error {
-  color: #d32f2f;
-  text-align: center;
+  color: #dc3545;
   padding: 20px;
-  font-size: 16px;
+  text-align: center;
+  background: #ffebee;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.empty-message {
+  text-align: center;
+  color: #666;
+  padding: 20px;
 }
 
 /* ... предыдущие стили остаются без изменений ... */
@@ -285,5 +274,28 @@
 
 .delete-review-btn:hover {
   background-color: #d32f2f;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 15px;
+  }
+
+  .orders-list {
+    grid-template-columns: 1fr;
+  }
+
+  .order-card {
+    padding: 15px;
+  }
+
+  .order-card h3 {
+    font-size: 16px;
+  }
+
+  .order-details p {
+    font-size: 13px;
+  }
 }
 

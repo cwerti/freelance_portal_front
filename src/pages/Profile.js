@@ -259,6 +259,10 @@ const Profile = () => {
     return null;
   };
 
+  const handleOrderClick = (orderId) => {
+    navigate(`/project/${orderId}`);
+  };
+
   if (loadingUser) return <div className="loading">Загрузка профиля...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!userData) return <div className="error">Пользователь не найден</div>;
@@ -291,20 +295,25 @@ const Profile = () => {
 
       {isCurrentUser && (
         <div className="orders-section">
-          <h3>Мои заказы</h3>
+          <h3>Мои проекты</h3>
           <div className="orders-list">
             {loadingOrders ? (
-              <p className="loading">Загрузка заказов...</p>
+              <p className="loading">Загрузка проектов...</p>
             ) : orders.length === 0 ? (
-              <p className="empty-message">Заказов пока нет.</p>
+              <p className="empty-message">Проектов пока нет.</p>
             ) : (
               orders.map((order) => (
-                <div key={order.id} className="order-card">
+                <div 
+                  key={order.id} 
+                  className="order-card"
+                  onClick={() => handleOrderClick(order.id)}
+                >
                   <h4>{order.name}</h4>
-                  <p><strong>Категория:</strong> {order.category_name}</p>
-                  <p><strong>Цена:</strong> {order.start_price}₽</p>
-                  <p><strong>Описание:</strong> {order.description}</p>
-                  <p><strong>Ведет:</strong> {order.author_name}</p>
+                  <div className="order-details">
+                    <p><strong>Категория:</strong> {order.category_name}</p>
+                    <p><strong>Стартовая цена:</strong> {order.start_price} ₽</p>
+                    <p><strong>Статус:</strong> {order.status}</p>
+                  </div>
                 </div>
               ))
             )}
