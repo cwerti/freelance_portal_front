@@ -86,7 +86,6 @@ const Profile = () => {
         },
         credentials: "include",
       });
-
       if (response.ok) {
         const data = await response.json();
         console.log("Ордера:", data);  // Логируем ордера

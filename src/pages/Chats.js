@@ -31,11 +31,7 @@ useEffect(() => {
             // Формируем URL с ID пользователя
             const response = await fetch(`http://localhost:8000/chats/get_my_chats`, {
                 method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+                credentials: 'include'
             });
 
             console.log("Статус ответа:", response.status);

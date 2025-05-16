@@ -28,10 +28,12 @@ function App() {
         <Route path="/profile" element={<Profile />} /> {/* маршрут */}
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project/:id" element={<ProjectDetails />} />
+        <Route path="/orders/:id" element={<ProjectDetails />} />
+        <Route path="/orders" element={<ProjectDetails />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/chats" element={<Chats />} />
-        <Route path="/ChatPage" element={<ChatPage />} />
-        <Route path="/chat/:chatId" element={<ChatPage />} />
+        <Route path="/ChatPage" element={<ChatPage userId = {2}  />} />
+        <Route path="/chats/:chatId" element={<ChatPage userId = {2}  />} />
         <Route path="/category/:categoryName" element={<CategoryPage />} />
         <Route path="/About" element={<AboutPage />} />
       </Routes>
