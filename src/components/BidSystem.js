@@ -2,48 +2,64 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/BidSystem.css';
 
-const BidSystem = ({ projectId, isOwner, userId, projectStatus }) => {
+const BidSystem = ({ projectId, projectOwnerId, currentUserId, projectStatus }) => {
   const [bids, setBids] = useState([]);
   const [newBid, setNewBid] = useState({ price: '', comment: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Определяем, является ли текущий пользователь владельцем проекта
+  const isProjectOwner = currentUserId === projectOwnerId;
+
   // Fetch bids for the project
   const fetchBids = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/bids/by-user/${projectId}`);
+      // Получаем все отклики для данного проекта
+      const response = await axios.get(`/bids/by-user/${projectId}`);
       setBids(response.data);
     } catch (err) {
       setError('Failed to load bids');
+      console.error('Error fetching bids:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchBids();
+    if (projectId) {
+      fetchBids();
+    }
   }, [projectId]);
 
   // Handle bid submission
   const handleSubmitBid = async (e) => {
     e.preventDefault();
+    
+    // Проверяем, не является ли пользователь владельцем проекта
+    if (isProjectOwner) {
+      setError('You cannot bid on your own project');
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');
       
-      await axios.post(`/api/bids/orders/${projectId}/bids`, {
-        userId: userId,
+      // Используем правильный URL для создания отклика
+      await axios.post(`/bids/orders/${projectId}/bids`, {
+        userId: currentUserId,
         price: parseFloat(newBid.price),
         comment: newBid.comment
       });
 
       setSuccess('Bid submitted successfully!');
       setNewBid({ price: '', comment: '' });
-      fetchBids();
+      fetchBids(); // Обновляем список откликов
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to submit bid');
+      console.error('Error submitting bid:', err);
     } finally {
       setLoading(false);
     }
@@ -51,13 +67,21 @@ const BidSystem = ({ projectId, isOwner, userId, projectStatus }) => {
 
   // Handle bid acceptance
   const handleAcceptBid = async (bidId) => {
+    // Проверяем, является ли текущий пользователь владельцем проекта
+    if (!isProjectOwner) {
+      setError('Only project owner can accept bids');
+      return;
+    }
+
     try {
       setLoading(true);
-      await axios.patch(`/api/bids/bids/${bidId}/accept`);
+      // Используем правильный URL для принятия отклика
+      await axios.patch(`/bids/bids/${bidId}/accept`);
       setSuccess('Bid accepted successfully!');
-      fetchBids();
+      fetchBids(); // Обновляем список откликов
     } catch (err) {
       setError('Failed to accept bid');
+      console.error('Error accepting bid:', err);
     } finally {
       setLoading(false);
     }
@@ -65,13 +89,21 @@ const BidSystem = ({ projectId, isOwner, userId, projectStatus }) => {
 
   // Handle bid rejection
   const handleRejectBid = async (bidId) => {
+    // Проверяем, является ли текущий пользователь владельцем проекта
+    if (!isProjectOwner) {
+      setError('Only project owner can reject bids');
+      return;
+    }
+
     try {
       setLoading(true);
-      await axios.patch(`/api/bids/bids/${bidId}/reject`);
+      // Используем правильный URL для отклонения отклика
+      await axios.patch(`/bids/bids/${bidId}/reject`);
       setSuccess('Bid rejected successfully!');
-      fetchBids();
+      fetchBids(); // Обновляем список откликов
     } catch (err) {
       setError('Failed to reject bid');
+      console.error('Error rejecting bid:', err);
     } finally {
       setLoading(false);
     }
@@ -84,7 +116,11 @@ const BidSystem = ({ projectId, isOwner, userId, projectStatus }) => {
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
 
-      {!isOwner && projectStatus === 1 && (
+      {/* Показываем форму отклика только если:
+          1. Пользователь не является владельцем проекта
+          2. Проект активен (статус === 1)
+      */}
+      {!isProjectOwner && projectStatus === 1 && (
         <div className="bid-form-container">
           <h3>Submit Your Bid</h3>
           <form onSubmit={handleSubmitBid} className="bid-form">
@@ -115,7 +151,8 @@ const BidSystem = ({ projectId, isOwner, userId, projectStatus }) => {
         </div>
       )}
 
-      {isOwner && (
+      {/* Показываем список откликов только владельцу проекта */}
+      {isProjectOwner && (
         <div className="bids-list">
           <h3>Project Bids</h3>
           {bids.length === 0 ? (
@@ -126,8 +163,9 @@ const BidSystem = ({ projectId, isOwner, userId, projectStatus }) => {
                 <div className="bid-info">
                   <p className="bid-price">${bid.price}</p>
                   <p className="bid-comment">{bid.comment}</p>
-                  <p className="bid-user">User ID: {bid.userId}</p>
+                  <p className="bid-user">Bidder ID: {bid.userId}</p>
                 </div>
+                {/* Показываем кнопки принятия/отклонения только если проект активен */}
                 {projectStatus === 1 && (
                   <div className="bid-actions">
                     <button

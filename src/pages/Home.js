@@ -8,10 +8,12 @@ const Home = () => {
   const [recentProjects, setRecentProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = getCookie('access_token');
+    setIsAuthenticated(!!token);
     if (token) {
       fetchCategories(token);
       fetchRecentProjects(token);
@@ -145,14 +147,21 @@ const Home = () => {
       <section className="cta-section">
         <div className="cta-content">
           <h2>Готовы начать?</h2>
-          <p>Создайте свой проект или найдите подходящий заказ прямо сейчас</p>
+          <p>
+            {isAuthenticated 
+              ? "Создайте свой проект прямо сейчас"
+              : "Создайте свой проект или найдите подходящий заказ прямо сейчас"
+            }
+          </p>
           <div className="cta-buttons">
             <Link to="/create-project" className="cta-button primary">
               Создать проект
             </Link>
-            <Link to="/register" className="cta-button secondary">
-              Зарегистрироваться
-            </Link>
+            {!isAuthenticated && (
+              <Link to="/register" className="cta-button secondary">
+                Зарегистрироваться
+              </Link>
+            )}
           </div>
         </div>
       </section>

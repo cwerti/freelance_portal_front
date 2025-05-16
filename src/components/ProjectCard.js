@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatPrice } from '../utils/formatters';
 import '../styles/ProjectCard.css';
 
 const ProjectCard = ({ project, isOwner, onDelete }) => {
@@ -60,11 +61,6 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
       class: 'status-unknown',
       icon: '❓'
     };
-  };
-
-  const formatPrice = (price) => {
-    if (!price) return '0';
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   };
 
   const handleEdit = () => {

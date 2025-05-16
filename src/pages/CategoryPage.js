@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { formatPrice } from '../utils/formatters';
 import '../styles/CategoryPage.css';
 
 const CategoryPage = () => {
@@ -125,9 +126,12 @@ const CategoryPage = () => {
         let data = await response.json();
         console.log('Received all projects:', data);
         
-        // Filter projects by category
-        data = data.filter(project => project.category_id === currentCategory.id);
-        console.log('Filtered projects for category:', data);
+        // Filter projects by category and active status
+        data = data.filter(project => 
+          project.category_id === currentCategory.id && 
+          project.status_id === 1
+        );
+        console.log('Filtered active projects for category:', data);
 
         // Фильтрация по цене
         if (priceRange.min || priceRange.max) {
@@ -255,7 +259,7 @@ const CategoryPage = () => {
               </p>
 
               <div className="project-meta">
-                <span className="price">{project.start_price} ₽</span>
+                <span className="price">{formatPrice(project.start_price)} ₽</span>
                 <span className="date">
                   {new Date(project.created_at).toLocaleDateString()}
                 </span>
