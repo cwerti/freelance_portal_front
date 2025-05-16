@@ -47,9 +47,19 @@ const ProjectDetails = () => {
         const data = await response.json();
         setProject(data);
         
-        // Check if current user is the owner
+        // Проверяем, является ли текущий пользователь владельцем
         const decodedToken = jwtDecode(token);
-        const isOwnerResult = decodedToken.sub === data.author_id.toString();
+        console.log('Token data:', decodedToken);
+        console.log('Project author_id:', data.author_id);
+        
+        // Проверяем оба возможных поля для ID пользователя
+        const tokenUserId = decodedToken.id || decodedToken.sub;
+        console.log('Token user ID:', tokenUserId);
+        
+        const isOwnerResult = tokenUserId && data.author_id && 
+          (tokenUserId.toString() === data.author_id.toString());
+        console.log('Is owner:', isOwnerResult);
+        
         setIsOwner(isOwnerResult);
 
         // Если пользователь владелец, загружаем отклики
@@ -105,6 +115,7 @@ const ProjectDetails = () => {
     }
 
     try {
+      console.log('Deleting project:', id);
       const response = await fetch(`http://localhost:8000/orders/${id}`, {
         method: 'DELETE',
         headers: {
@@ -115,12 +126,15 @@ const ProjectDetails = () => {
       });
 
       if (response.ok) {
-        navigate('/profile', { state: { message: 'Проект успешно удален' } });
+        console.log('Project deleted successfully');
+        navigate('/profile');
       } else {
         const errorText = await response.text();
-        setError(`Не удалось удалить проект: ${response.status} ${errorText}`);
+        console.error('Error deleting project:', errorText);
+        setError(`Не удалось удалить проект: ${errorText}`);
       }
     } catch (err) {
+      console.error('Error in delete handler:', err);
       setError(`Ошибка при удалении проекта: ${err.message}`);
     }
   };
@@ -173,7 +187,7 @@ const ProjectDetails = () => {
         statusId: parseInt(project.status_id)
       };
 
-      const response = await fetch(`http://localhost:8000/orders/update?order_id=${id}`, {
+      const response = await fetch(`http://localhost:8000/orders/update?order_id=${project.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -230,17 +244,6 @@ const ProjectDetails = () => {
   return (
     <div className="main-content">
       <div className="project-details-container">
-        {isOwner && (
-          <div className="owner-controls">
-            <button onClick={() => setShowEditForm(true)} className="edit-btn">
-              Изменить заказ
-            </button>
-            <button onClick={handleDelete} className="delete-btn">
-              Удалить проект
-            </button>
-          </div>
-        )}
-        
         <ProjectCard
           project={project}
           isOwner={isOwner}
@@ -308,15 +311,18 @@ const ProjectDetails = () => {
                 </div>
                 <div className="form-group">
                   <label>Категория</label>
-                  <input
-                    type="number"
+                  <select
                     value={project.category_id}
                     onChange={(e) => setProject({
                       ...project,
                       category_id: parseInt(e.target.value)
                     })}
                     required
-                  />
+                  >
+                    <option value="1">Разработка</option>
+                    <option value="2">Дизайн</option>
+                    <option value="3">Маркетинг</option>
+                  </select>
                 </div>
                 <div className="form-actions">
                   <button type="submit" className="save-button">

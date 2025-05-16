@@ -68,6 +68,90 @@
   }
 }
 
+/* Оптимизированные keyframes для анимаций */
+@keyframes slideInRight {
+  from {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes smoothFloat {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes statusGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.2);
+  }
+}
+
+@keyframes shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes cardHoverEffect {
+  0% {
+    transform: translateY(-5px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(0.5deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(-0.5deg);
+  }
+  100% {
+    transform: translateY(-5px) rotate(0deg);
+  }
+}
+
+@keyframes statusPulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes priceShine {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
 /* Общие стили для профиля */
 .profile-container {
   font-family: 'Arial', sans-serif;
@@ -185,6 +269,7 @@
 
 .orders-group {
   margin-bottom: 2rem;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
 .orders-group h4 {
@@ -193,6 +278,7 @@
   font-size: 1.2rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #e0e0e0;
+  position: relative;
 }
 
 .orders-grid {
@@ -231,14 +317,52 @@
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  animation: slideInRight 0.5s ease-out forwards;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow;
 }
 
 .order-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
+
+.order-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(120deg, 
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 10%,
+    transparent 20%
+  );
+  background-size: 200% 100%;
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.order-card:hover::after {
+  opacity: 1;
+  animation: shine 1.5s ease-in-out;
+}
+
+.orders-grid .order-card {
+  opacity: 0;
+}
+
+.orders-grid .order-card:nth-child(1) { animation-delay: 0.1s; }
+.orders-grid .order-card:nth-child(2) { animation-delay: 0.2s; }
+.orders-grid .order-card:nth-child(3) { animation-delay: 0.3s; }
+.orders-grid .order-card:nth-child(4) { animation-delay: 0.4s; }
+.orders-grid .order-card:nth-child(5) { animation-delay: 0.5s; }
 
 .order-card h4 {
   margin: 0 0 1rem 0;
@@ -258,12 +382,16 @@
 .order-details p {
   margin: 0;
   color: #546e7a;
+  transition: color 0.3s ease;
 }
 
 .order-details .price {
   font-size: 1.1rem;
   color: #2c3e50;
   font-weight: 500;
+  position: relative;
+  display: inline-block;
+  padding: 2px 0;
 }
 
 .status {
@@ -273,31 +401,31 @@
   font-size: 0.9rem;
   font-weight: 500;
   margin-top: 0.5rem;
+  transition: all 0.3s ease;
 }
 
 .status-active {
   background-color: #e8f5e9;
   color: #2e7d32;
+  box-shadow: 0 0 5px rgba(46, 125, 50, 0.2);
 }
 
 .status-in-progress {
   background-color: #fff3e0;
   color: #f57c00;
+  box-shadow: 0 0 5px rgba(245, 124, 0, 0.2);
 }
 
 .status-completed {
   background-color: #e8eaf6;
   color: #3f51b5;
+  box-shadow: 0 0 5px rgba(63, 81, 181, 0.2);
 }
 
 .status-cancelled {
   background-color: #ffebee;
   color: #c62828;
-}
-
-.status-unknown {
-  background-color: #f5f5f5;
-  color: #757575;
+  box-shadow: 0 0 5px rgba(198, 40, 40, 0.2);
 }
 
 /* Стили для отзывов */
@@ -458,17 +586,21 @@
   }
 
   .orders-grid {
-    grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .order-card {
+    flex: 0 0 280px;
     padding: 1rem;
   }
 }
 
 /* Отключение анимаций при предпочтении уменьшенного движения */
 @media (prefers-reduced-motion: reduce) {
-  * {
+  .order-card,
+  .orders-group,
+  .status,
+  .order-card::after {
     animation: none !important;
     transition: none !important;
   }

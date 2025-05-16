@@ -4,6 +4,7 @@ import axios from 'axios';
 import { formatPrice } from '../utils/formatters';
 import BidSystem from './BidSystem';
 import '../styles/ProjectCard.css';
+import { jwtDecode } from 'jwt-decode';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -13,9 +14,42 @@ const ProjectDetails = () => {
   const [category, setCategory] = useState(null);
   const [categoryLoading, setCategoryLoading] = useState(false);
   const [categoryError, setCategoryError] = useState('');
+  const [currentUserId, setCurrentUserId] = useState(null);
   
-  // Get current user ID from your auth system
-  const currentUserId = localStorage.getItem('userId');
+  // Get current user ID from JWT token
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  };
+
+  // Получаем ID пользователя при монтировании компонента
+  useEffect(() => {
+    const token = getCookie('access_token');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        console.log('=== Token Information ===');
+        console.log('Decoded token:', decodedToken);
+        
+        // Получаем ID пользователя из токена
+        const userId = decodedToken.sub ? parseInt(decodedToken.sub) : null;
+        console.log('Extracted user ID:', userId);
+        
+        if (!userId) {
+          console.error('No user ID found in token');
+          return;
+        }
+        
+        setCurrentUserId(userId);
+      } catch (err) {
+        console.error('Error decoding token:', err);
+      }
+    } else {
+      console.error('No access token found');
+    }
+  }, []);
 
   // Fetch project details
   useEffect(() => {

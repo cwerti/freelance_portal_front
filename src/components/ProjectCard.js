@@ -1,12 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '../utils/formatters';
+import { jwtDecode } from 'jwt-decode';
 import '../styles/ProjectCard.css';
 
 const ProjectCard = ({ project, isOwner, onDelete }) => {
   const navigate = useNavigate();
+  
+  console.log('ProjectCard rendered with props:', {
+    projectId: project?.id,
+    isOwner: isOwner,
+    authorId: project?.author_id
+  });
+
   const [responseError, setResponseError] = useState('');
   const [showResponseForm, setShowResponseForm] = useState(false);
+  const [showBidsModal, setShowBidsModal] = useState(false);
+  const [bids, setBids] = useState([]);
+  const [bidsError, setBidsError] = useState('');
   const [statusUpdateError, setStatusUpdateError] = useState('');
   const [showEditForm, setShowEditForm] = useState(false);
   const [editOrderError, setEditOrderError] = useState('');
@@ -68,44 +79,127 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
   };
 
   const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
+    try {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) {
+        const token = parts.pop().split(';').shift();
+        console.log('Found token in cookies:', token ? 'Yes' : 'No');
+        return token;
+      }
+      console.log('Token not found in cookies');
+      return null;
+    } catch (err) {
+      console.error('Error reading cookie:', err);
+      return null;
+    }
+  };
+
+  const validateToken = (token) => {
+    try {
+      const decodedToken = jwtDecode(token);
+      console.log('Token contents:', decodedToken);
+      
+      // Проверяем срок действия токена
+      const currentTime = Date.now() / 1000;
+      if (decodedToken.exp && decodedToken.exp < currentTime) {
+        console.error('Token has expired');
+        return null;
+      }
+
+      // Проверяем наличие ID пользователя (может быть в поле sub или id)
+      const userId = parseInt(decodedToken.id || decodedToken.sub);
+      console.log('Extracted user ID:', userId);
+
+      if (isNaN(userId)) {
+        console.error('Invalid user ID in token');
+        return null;
+      }
+
+      return userId;
+    } catch (err) {
+      console.error('Error validating token:', err);
+      return null;
+    }
   };
 
   const handleResponse = async (e) => {
     e.preventDefault();
     const token = getCookie('access_token');
+    
     if (!token) {
+      setResponseError('Пожалуйста, войдите в систему');
       navigate('/login');
       return;
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/responses/create/${project.id}`, {
+      // Получаем ID пользователя из токена
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.id;
+
+      if (!userId) {
+        setResponseError('Ошибка авторизации. Не удалось получить ID пользователя');
+        return;
+      }
+
+      if (!responseData.price || !responseData.comment) {
+        setResponseError('Пожалуйста, заполните все поля');
+        return;
+      }
+
+      // Формируем данные точно как в примере
+      const bidData = {
+        userId: userId,
+        price: parseFloat(responseData.price),
+        comment: responseData.comment.trim()
+      };
+
+      console.log('Отправляемые данные:', bidData);
+
+      const response = await fetch(`http://localhost:8000/bids/orders/${project.id}/bids`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify(responseData)
+        body: JSON.stringify(bidData)
       });
 
-      if (response.ok) {
+      let responseText;
+      try {
+        responseText = await response.text();
+        console.log('Полный ответ сервера:', responseText);
+        
+        if (!response.ok) {
+          const apiResponse = responseText ? JSON.parse(responseText) : {};
+          if (apiResponse.detail) {
+            const errorMessage = Array.isArray(apiResponse.detail) 
+              ? apiResponse.detail[0].msg 
+              : apiResponse.detail;
+            setResponseError(`Ошибка: ${errorMessage}`);
+          } else {
+            setResponseError('Произошла ошибка при отправке отклика');
+          }
+          return;
+        }
+
+        // Если ответ успешный
         setShowResponseForm(false);
         setResponseData({ price: '', comment: '' });
-      } else {
-        const errorData = await response.text();
-        setResponseError(`Ошибка при отправке отклика: ${errorData}`);
+        window.location.reload();
+      } catch (parseError) {
+        console.error('Ошибка при обработке ответа:', parseError);
+        setResponseError(`Ошибка при обработке ответа сервера: ${responseText}`);
       }
     } catch (err) {
+      console.error('Error submitting bid:', err);
       setResponseError(`Ошибка: ${err.message}`);
     }
   };
 
-  const handleStatusChange = async (newStatus) => {
+  const handleStatusChange = async (newStatus, bidId = null) => {
     const token = getCookie('access_token');
     if (!token) {
       navigate('/login');
@@ -113,14 +207,28 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/projects/${project.id}/status`, {
-        method: 'PATCH',
+      let url = bidId 
+        ? `http://localhost:8000/bids/bids/${bidId}/accept`
+        : `http://localhost:8000/orders/update?order_id=${project.id}`;
+
+      let body = bidId 
+        ? {}
+        : {
+            name: project.name || project.title,
+            description: project.description,
+            startPrice: parseInt(project.start_price),
+            categoryId: parseInt(project.category_id),
+            statusId: parseInt(newStatus)
+          };
+
+      const response = await fetch(url, {
+        method: bidId ? 'PATCH' : 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify({ status_id: parseInt(newStatus) })
+        body: JSON.stringify(body)
       });
 
       if (!response.ok) {
@@ -129,7 +237,6 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
         return;
       }
 
-      // Refresh the page or update the project state
       window.location.reload();
     } catch (err) {
       setStatusUpdateError(`Ошибка: ${err.message}`);
@@ -168,6 +275,193 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
     }
   };
 
+  // Функция для загрузки откликов
+  const fetchBids = async () => {
+    const token = getCookie('access_token');
+    if (!token) {
+      setBidsError('Необходима авторизация');
+      return;
+    }
+
+    try {
+      console.log('Fetching bids for project:', project.id);
+      const response = await fetch(`http://localhost:8000/bids/orders/${project.id}/bids`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+
+      const responseText = await response.text();
+      console.log('Response from server:', responseText);
+
+      if (!response.ok) {
+        setBidsError('Ошибка при загрузке откликов');
+        return;
+      }
+
+      const bidsData = responseText ? JSON.parse(responseText) : [];
+      console.log('Received bids:', bidsData);
+      setBids(bidsData);
+      setShowBidsModal(true);
+    } catch (err) {
+      console.error('Ошибка при загрузке откликов:', err);
+      setBidsError('Ошибка при загрузке откликов');
+    }
+  };
+
+  const handleAcceptBid = async (bidId) => {
+    const token = getCookie('access_token');
+    if (!token) {
+      setBidsError('Необходима авторизация');
+      return;
+    }
+
+    try {
+      // Принимаем отклик
+      const acceptResponse = await fetch(`http://localhost:8000/bids/bids/${bidId}/accept`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+
+      if (!acceptResponse.ok) {
+        const errorText = await acceptResponse.text();
+        setBidsError(`Ошибка при принятии отклика: ${errorText}`);
+        return;
+      }
+
+      // Обновляем статус проекта на "В работе"
+      const updateStatusResponse = await fetch(`http://localhost:8000/orders/update?order_id=${project.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          name: project.name || project.title,
+          description: project.description,
+          startPrice: parseInt(project.start_price),
+          categoryId: parseInt(project.category_id),
+          statusId: 2 // Статус "В работе"
+        })
+      });
+
+      if (!updateStatusResponse.ok) {
+        const errorText = await updateStatusResponse.text();
+        setBidsError(`Ошибка при обновлении статуса проекта: ${errorText}`);
+        return;
+      }
+
+      await fetchBids(); // Обновляем список откликов
+      window.location.reload(); // Перезагружаем страницу для обновления статуса
+    } catch (err) {
+      console.error('Ошибка при принятии отклика:', err);
+      setBidsError('Ошибка при принятии отклика');
+    }
+  };
+
+  const handleRejectBid = async (bidId) => {
+    const token = getCookie('access_token');
+    if (!token) {
+      setBidsError('Необходима авторизация');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8000/bids/bids/${bidId}/reject`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        setBidsError(`Ошибка при отклонении отклика: ${errorText}`);
+        return;
+      }
+
+      await fetchBids(); // Обновляем список откликов
+    } catch (err) {
+      console.error('Ошибка при отклонении отклика:', err);
+      setBidsError('Ошибка при отклонении отклика');
+    }
+  };
+
+  const getBidStatusText = (status) => {
+    const statuses = {
+      1: 'На рассмотрении',
+      2: 'Принят',
+      3: 'Отклонен'
+    };
+    return statuses[status] || 'Неизвестный статус';
+  };
+
+  // Компонент модального окна с откликами
+  const BidsModal = () => {
+    if (!showBidsModal) return null;
+
+    return (
+      <div className="bids-modal-overlay">
+        <div className="bids-modal">
+          <div className="bids-modal-header">
+            <h2>Отклики на проект</h2>
+            <button className="close-button" onClick={() => setShowBidsModal(false)}>×</button>
+          </div>
+          {bidsError && <div className="error-message">{bidsError}</div>}
+          <div className="bids-list">
+            {bids.length === 0 ? (
+              <p className="no-bids">На данный проект пока нет откликов</p>
+            ) : (
+              bids.map((bid) => (
+                <div key={bid.id} className="bid-item">
+                  <div className="bid-header">
+                    <span className="bid-author">Фрилансер ID: {bid.userId}</span>
+                    <span className="bid-price">{formatPrice(bid.price)} ₽</span>
+                  </div>
+                  <p className="bid-comment">{bid.comment}</p>
+                  <div className="bid-info">
+                    <div className="bid-date">
+                      Отправлено: {bid.createdAt ? new Date(bid.createdAt).toLocaleString('ru-RU') : 'Дата не указана'}
+                    </div>
+                    <div className="bid-status">
+                      Статус: {getBidStatusText(bid.status)}
+                    </div>
+                  </div>
+                  {project.status_id === 1 && bid.status === 1 && (
+                    <div className="bid-actions">
+                      <button 
+                        onClick={() => handleAcceptBid(bid.id)}
+                        className="accept-bid-button"
+                      >
+                        Принять отклик
+                      </button>
+                      <button 
+                        onClick={() => handleRejectBid(bid.id)}
+                        className="reject-bid-button"
+                      >
+                        Отклонить
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const statusInfo = getStatusInfo(project.status_id);
 
   return (
@@ -180,18 +474,13 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
               <span className="status-icon">{statusInfo.icon}</span>
               <span className="status-text">{statusInfo.text}</span>
             </div>
-            <span className="status-description">{statusInfo.description}</span>
+            <div className="status-description">{statusInfo.description}</div>
           </div>
           <span className="category">{project.category}</span>
           <div className="price-info">
             <span className="price">
-              Стартовая цена: {formatPrice(project.start_price)} ₽
+              Максимальная цена: {formatPrice(project.start_price)} ₽
             </span>
-            {project.expected_price && (
-              <span className="price expected">
-                Ожидаемая цена: {formatPrice(project.expected_price)} ₽
-              </span>
-            )}
           </div>
         </div>
       </div>
@@ -233,6 +522,9 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
 
         {isOwner ? (
           <div className="author-controls">
+            <button onClick={fetchBids} className="view-bids-button">
+              Посмотреть отклики
+            </button>
             <div className="status-control">
               <select
                 value={project.status_id}
@@ -242,7 +534,6 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
                 <option value="1">Активный</option>
                 <option value="2">В работе</option>
                 <option value="3">Завершен</option>
-                <option value="4">Отменен</option>
               </select>
               {statusUpdateError && (
                 <div className="error-message">{statusUpdateError}</div>
@@ -251,9 +542,9 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
             <button onClick={() => setShowEditForm(true)} className="edit-btn">
               Изменить заказ
             </button>
-            <button onClick={onDelete} className="delete-btn">
+            {/* <button onClick={onDelete} className="delete-btn">
               Удалить проект
-            </button>
+            </button> */}
           </div>
         ) : project.status_id === 1 && (
           <div className="response-section">
@@ -272,7 +563,7 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
                 )}
                 <form onSubmit={handleResponse}>
                   <div className="form-group">
-                    <label>Предлагаемая цена (₽)</label>
+                    <label>Предложите свою цену (₽)</label>
                     <input
                       type="number"
                       value={responseData.price}
@@ -282,7 +573,7 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
                       })}
                       required
                       min={project.start_price || 0}
-                      placeholder={`Минимум ${formatPrice(project.start_price)} ₽`}
+                      placeholder="Укажите вашу цену"
                     />
                   </div>
                   <div className="form-group">
@@ -364,17 +655,6 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Ожидаемая цена (₽)</label>
-                  <input
-                    type="number"
-                    value={orderData.expected_price}
-                    onChange={(e) => setOrderData({
-                      ...orderData,
-                      expected_price: e.target.value
-                    })}
-                  />
-                </div>
-                <div className="form-group">
                   <label>Дедлайн</label>
                   <input
                     type="datetime-local"
@@ -428,6 +708,9 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
           </div>
         )}
       </div>
+
+      {/* Добавляем модальное окно с откликами */}
+      <BidsModal />
     </div>
   );
 };
