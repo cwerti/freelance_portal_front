@@ -2,7 +2,7 @@ import React from "react";
 import "../styles/Home.css";
 import { BlockList } from "../components/Blocks.js"
 import { Link } from "react-router-dom";
-import ParticlesBg from 'particles-bg'
+
 
 const Home = () => {
   return (
