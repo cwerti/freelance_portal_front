@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatPrice } from '../utils/formatters';
 import { jwtDecode } from 'jwt-decode';
 import '../styles/ProjectCard.css';
+
+// Добавляем стили для анимации загрузки
+const spinKeyframes = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
 
 const ProjectCard = ({ project, isOwner, onDelete }) => {
   const navigate = useNavigate();
@@ -26,14 +34,46 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
     comment: '',
   });
   const [orderData, setOrderData] = useState({
-    title: project.title,
+    name: project.title || project.name,
     description: project.description,
-    start_price: project.start_price,
-    expected_price: project.expected_price,
-    deadline: project.deadline,
-    requirements: project.requirements,
-    category: project.category
+    startPrice: project.start_price,
+    categoryId: project.category_id || 1,
+    statusId: project.status_id
   });
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [isLoadingBids, setIsLoadingBids] = useState(false);
+  const [isSubmittingBid, setIsSubmittingBid] = useState(false);
+
+  // Загрузка категорий при монтировании компонента
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        console.log('Загрузка категорий...');
+        const response = await fetch('http://localhost:8000/orders/categories', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Загруженные категории:', data);
+          setCategories(data);
+        } else {
+          console.error('Ошибка при загрузке категорий:', response.status);
+        }
+      } catch (err) {
+        console.error('Ошибка при загрузке категорий:', err);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
@@ -134,6 +174,9 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
     }
 
     try {
+      setIsSubmittingBid(true);
+      setResponseError('');
+
       // Получаем ID пользователя из токена
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.id;
@@ -148,54 +191,85 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
         return;
       }
 
-      // Формируем данные точно как в примере
+      // Проверяем ID проекта
+      if (!project.id) {
+        setResponseError('Ошибка: ID проекта не найден');
+        return;
+      }
+
+      // Формируем данные для отправки
       const bidData = {
-        userId: userId,
+        userId: parseInt(userId),
         price: parseFloat(responseData.price),
         comment: responseData.comment.trim()
       };
 
-      console.log('Отправляемые данные:', bidData);
+      console.log('Отправляемые данные отклика:', bidData);
+      console.log('URL для отправки:', `http://localhost:8000/bids/orders/${project.id}/bids`);
+
+      // Сначала выполняем preflight запрос для проверки CORS
+      const preflightResponse = await fetch(`http://localhost:8000/bids/orders/${project.id}/bids`, {
+        method: 'OPTIONS',
+        headers: {
+          'Origin': window.location.origin,
+          'Access-Control-Request-Method': 'POST',
+          'Access-Control-Request-Headers': 'Authorization, Content-Type'
+        }
+      }).catch(err => {
+        console.log('Preflight request failed:', err);
+        // Продолжаем даже если preflight не удался
+        return { ok: false };
+      });
 
       const response = await fetch(`http://localhost:8000/bids/orders/${project.id}/bids`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Origin': window.location.origin
         },
-        credentials: 'include',
         body: JSON.stringify(bidData)
       });
 
-      let responseText;
-      try {
-        responseText = await response.text();
-        console.log('Полный ответ сервера:', responseText);
-        
-        if (!response.ok) {
+      console.log('Статус ответа:', response.status);
+      
+      // Получаем текст ответа даже если ответ не успешный
+      const responseText = await response.text();
+      console.log('Полный ответ сервера:', responseText);
+      
+      if (!response.ok) {
+        try {
+          // Пробуем распарсить JSON, если возможно
           const apiResponse = responseText ? JSON.parse(responseText) : {};
+          
           if (apiResponse.detail) {
             const errorMessage = Array.isArray(apiResponse.detail) 
               ? apiResponse.detail[0].msg 
               : apiResponse.detail;
             setResponseError(`Ошибка: ${errorMessage}`);
           } else {
-            setResponseError('Произошла ошибка при отправке отклика');
+            setResponseError(`Ошибка при отправке отклика: ${response.status}`);
           }
-          return;
+        } catch (parseError) {
+          // Если не удалось распарсить JSON, показываем текст как есть
+          setResponseError(`Ошибка: ${responseText || response.statusText}`);
         }
-
-        // Если ответ успешный
-        setShowResponseForm(false);
-        setResponseData({ price: '', comment: '' });
-        window.location.reload();
-      } catch (parseError) {
-        console.error('Ошибка при обработке ответа:', parseError);
-        setResponseError(`Ошибка при обработке ответа сервера: ${responseText}`);
+        return;
       }
+
+      // Если ответ успешный
+      setShowResponseForm(false);
+      setResponseData({ price: '', comment: '' });
+      
+      // Показываем сообщение об успехе перед перезагрузкой
+      alert('Отклик успешно отправлен!');
+      window.location.reload();
     } catch (err) {
-      console.error('Error submitting bid:', err);
-      setResponseError(`Ошибка: ${err.message}`);
+      console.error('Ошибка при отправке отклика:', err);
+      setResponseError(`Ошибка при отправке: ${err.message}`);
+    } finally {
+      setIsSubmittingBid(false);
     }
   };
 
@@ -252,25 +326,45 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/projects/${project.id}`, {
+      // Валидация данных
+      if (!orderData.name || !orderData.description || !orderData.startPrice) {
+        setEditOrderError('Пожалуйста, заполните все обязательные поля');
+        return;
+      }
+
+      // Используем изначальную категорию проекта
+      const body = {
+        name: orderData.name,
+        description: orderData.description,
+        startPrice: parseInt(orderData.startPrice),
+        categoryId: parseInt(project.category_id), // Всегда используем исходную категорию
+        statusId: parseInt(orderData.statusId)
+      };
+
+      console.log('Отправка данных для обновления проекта:', body);
+
+      const response = await fetch(`http://localhost:8000/orders/update?order_id=${project.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
         },
-        credentials: 'include',
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(body)
       });
 
+      const responseText = await response.text();
+      console.log('Ответ сервера:', responseText);
+
       if (!response.ok) {
-        const errorData = await response.text();
-        setEditOrderError(`Ошибка при обновлении заказа: ${errorData}`);
+        setEditOrderError(`Ошибка при обновлении заказа: ${responseText}`);
         return;
       }
 
       setShowEditForm(false);
       window.location.reload();
     } catch (err) {
+      console.error('Ошибка при обновлении заказа:', err);
       setEditOrderError(`Ошибка: ${err.message}`);
     }
   };
@@ -284,31 +378,62 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
     }
 
     try {
-      console.log('Fetching bids for project:', project.id);
+      setIsLoadingBids(true);
+      setBidsError('');
+      
+      if (!project.id) {
+        console.error('ID проекта отсутствует');
+        setBidsError('Невозможно загрузить отклики: ID проекта не найден');
+        return;
+      }
+
+      console.log('Загрузка откликов для проекта:', project.id);
+      
       const response = await fetch(`http://localhost:8000/bids/orders/${project.id}/bids`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Origin': window.location.origin
+        }
       });
 
+      console.log('Статус ответа:', response.status);
       const responseText = await response.text();
-      console.log('Response from server:', responseText);
+      console.log('Ответ сервера:', responseText);
 
       if (!response.ok) {
-        setBidsError('Ошибка при загрузке откликов');
+        if (response.status === 404) {
+          // Если проект новый и откликов нет - показываем пустой список
+          console.log('Отклики не найдены (новый проект)');
+          setBids([]);
+          setShowBidsModal(true);
+          return;
+        }
+        
+        setBidsError(`Ошибка при загрузке откликов: ${response.status}`);
         return;
       }
 
-      const bidsData = responseText ? JSON.parse(responseText) : [];
-      console.log('Received bids:', bidsData);
-      setBids(bidsData);
+      try {
+        const bidsData = responseText ? JSON.parse(responseText) : [];
+        console.log('Полученные отклики:', bidsData);
+        setBids(Array.isArray(bidsData) ? bidsData : []);
+      } catch (parseError) {
+        console.error('Ошибка при разборе JSON:', parseError);
+        setBids([]);
+      }
+      
       setShowBidsModal(true);
     } catch (err) {
       console.error('Ошибка при загрузке откликов:', err);
-      setBidsError('Ошибка при загрузке откликов');
+      setBidsError(`Ошибка при загрузке откликов: ${err.message}`);
+      // При ошибке все равно покажем модальное окно с сообщением
+      setBids([]);
+      setShowBidsModal(true);
+    } finally {
+      setIsLoadingBids(false);
     }
   };
 
@@ -325,9 +450,9 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
+        }
       });
 
       if (!acceptResponse.ok) {
@@ -341,9 +466,9 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
         },
-        credentials: 'include',
         body: JSON.stringify({
           name: project.name || project.title,
           description: project.description,
@@ -363,7 +488,7 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
       window.location.reload(); // Перезагружаем страницу для обновления статуса
     } catch (err) {
       console.error('Ошибка при принятии отклика:', err);
-      setBidsError('Ошибка при принятии отклика');
+      setBidsError(`Ошибка при принятии отклика: ${err.message}`);
     }
   };
 
@@ -379,9 +504,9 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin
+        }
       });
 
       if (!response.ok) {
@@ -393,7 +518,7 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
       await fetchBids(); // Обновляем список откликов
     } catch (err) {
       console.error('Ошибка при отклонении отклика:', err);
-      setBidsError('Ошибка при отклонении отклика');
+      setBidsError(`Ошибка при отклонении отклика: ${err.message}`);
     }
   };
 
@@ -406,63 +531,231 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
     return statuses[status] || 'Неизвестный статус';
   };
 
-  // Компонент модального окна с откликами
+  // Обновленное модальное окно с откликами
   const BidsModal = () => {
     if (!showBidsModal) return null;
 
+    const modalStyles = {
+      overlay: {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        zIndex: 1000,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      },
+      modal: {
+        backgroundColor: '#fff',
+        borderRadius: '12px',
+        boxShadow: '0 5px 20px rgba(0, 0, 0, 0.2)',
+        width: '90%',
+        maxWidth: '700px',
+        maxHeight: '80vh',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column'
+      },
+      header: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '15px 20px',
+        borderBottom: '1px solid #eee',
+        backgroundColor: '#f8f8f8'
+      },
+      closeButton: {
+        border: 'none',
+        background: 'none',
+        fontSize: '24px',
+        cursor: 'pointer',
+        color: '#777'
+      },
+      content: {
+        padding: '20px',
+        overflowY: 'auto',
+        flex: 1
+      },
+      errorMessage: {
+        padding: '10px 15px',
+        margin: '0 20px 15px',
+        backgroundColor: '#ffebee',
+        color: '#c62828',
+        borderRadius: '5px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      },
+      retryButton: {
+        padding: '5px 10px',
+        backgroundColor: '#e0e0e0',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        marginLeft: '10px'
+      },
+      noBids: {
+        textAlign: 'center',
+        padding: '30px 20px',
+        color: '#757575'
+      },
+      infoText: {
+        textAlign: 'center',
+        color: '#757575',
+        fontSize: '14px',
+        marginTop: '10px'
+      },
+      refreshButton: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '8px 15px',
+        backgroundColor: '#f0f0f0',
+        border: 'none',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        color: '#333',
+        fontSize: '14px',
+        marginBottom: '15px',
+        transition: 'background-color 0.3s'
+      },
+      refreshIcon: {
+        marginRight: '5px',
+        fontSize: '16px'
+      },
+      loadingSpinner: {
+        display: 'inline-block',
+        width: '16px',
+        height: '16px',
+        border: '2px solid rgba(0, 0, 0, 0.1)',
+        borderRadius: '50%',
+        borderTopColor: '#333',
+        animation: 'spin 1s ease-in-out infinite',
+        marginRight: '8px'
+      },
+      headerActions: {
+        display: 'flex',
+        alignItems: 'center'
+      }
+    };
+
     return (
-      <div className="bids-modal-overlay">
-        <div className="bids-modal">
-          <div className="bids-modal-header">
-            <h2>Отклики на проект</h2>
-            <button className="close-button" onClick={() => setShowBidsModal(false)}>×</button>
-          </div>
-          {bidsError && <div className="error-message">{bidsError}</div>}
-          <div className="bids-list">
-            {bids.length === 0 ? (
-              <p className="no-bids">На данный проект пока нет откликов</p>
-            ) : (
-              bids.map((bid) => (
-                <div key={bid.id} className="bid-item">
-                  <div className="bid-header">
-                    <span className="bid-author">Фрилансер ID: {bid.userId}</span>
-                    <span className="bid-price">{formatPrice(bid.price)} ₽</span>
-                  </div>
-                  <p className="bid-comment">{bid.comment}</p>
-                  <div className="bid-info">
-                    <div className="bid-date">
-                      Отправлено: {bid.createdAt ? new Date(bid.createdAt).toLocaleString('ru-RU') : 'Дата не указана'}
-                    </div>
-                    <div className="bid-status">
-                      Статус: {getBidStatusText(bid.status)}
-                    </div>
-                  </div>
-                  {project.status_id === 1 && bid.status === 1 && (
-                    <div className="bid-actions">
-                      <button 
-                        onClick={() => handleAcceptBid(bid.id)}
-                        className="accept-bid-button"
-                      >
-                        Принять отклик
-                      </button>
-                      <button 
-                        onClick={() => handleRejectBid(bid.id)}
-                        className="reject-bid-button"
-                      >
-                        Отклонить
-                      </button>
-                    </div>
+      <>
+        {/* Добавляем стили анимации */}
+        <style>{spinKeyframes}</style>
+        
+        <div style={modalStyles.overlay}>
+          <div style={modalStyles.modal}>
+            <div style={modalStyles.header}>
+              <h2>Отклики на проект</h2>
+              <div style={modalStyles.headerActions}>
+                <button 
+                  onClick={fetchBids} 
+                  style={{...modalStyles.refreshButton, marginRight: '10px'}}
+                  disabled={isLoadingBids}
+                >
+                  {isLoadingBids ? (
+                    <>
+                      <span style={modalStyles.loadingSpinner}></span>
+                      Загрузка...
+                    </>
+                  ) : (
+                    <>
+                      <span style={modalStyles.refreshIcon}>↻</span>
+                      Обновить
+                    </>
+                  )}
+                </button>
+                <button style={modalStyles.closeButton} onClick={() => setShowBidsModal(false)}>×</button>
+              </div>
+            </div>
+            
+            <div style={modalStyles.content}>
+              {bidsError && (
+                <div style={modalStyles.errorMessage}>
+                  {bidsError}
+                  <button 
+                    onClick={() => fetchBids()}
+                    style={modalStyles.retryButton}
+                    disabled={isLoadingBids}
+                  >
+                    {isLoadingBids ? 'Загрузка...' : 'Повторить'}
+                  </button>
+                </div>
+              )}
+              
+              {isLoadingBids && !bidsError && (
+                <div style={{textAlign: 'center', padding: '20px'}}>
+                  <div style={{...modalStyles.loadingSpinner, width: '30px', height: '30px', margin: '0 auto 15px'}}></div>
+                  <p>Загрузка откликов...</p>
+                </div>
+              )}
+              
+              {!isLoadingBids && (!bids || bids.length === 0) && !bidsError && (
+                <div style={modalStyles.noBids}>
+                  <p className="no-bids">На данный проект пока нет откликов</p>
+                  {project.status_id === 1 && isOwner && (
+                    <p style={modalStyles.infoText}>
+                      Когда фрилансеры откликнутся на ваш проект, вы увидите их предложения здесь.
+                    </p>
                   )}
                 </div>
-              ))
-            )}
+              )}
+              
+              {!isLoadingBids && bids && bids.length > 0 && (
+                <div className="bids-list">
+                  {bids.map((bid) => (
+                    <div key={bid.id || `bid-${Math.random()}`} className="bid-item">
+                      <div className="bid-header">
+                        <span className="bid-author">Фрилансер ID: {bid.userId || 'Не указан'}</span>
+                        <span className="bid-price">{formatPrice(bid.price || 0)} ₽</span>
+                      </div>
+                      <p className="bid-comment">{bid.comment || 'Комментарий отсутствует'}</p>
+                      <div className="bid-info">
+                        <div className="bid-date">
+                          Отправлено: {bid.createdAt ? new Date(bid.createdAt).toLocaleString('ru-RU') : 'Дата не указана'}
+                        </div>
+                        <div className="bid-status">
+                          Статус: {getBidStatusText(bid.status)}
+                        </div>
+                      </div>
+                      {project.status_id === 1 && bid.status === 1 && isOwner && (
+                        <div className="bid-actions">
+                          <button 
+                            onClick={() => handleAcceptBid(bid.id)}
+                            className="accept-bid-button"
+                          >
+                            Принять отклик
+                          </button>
+                          <button 
+                            onClick={() => handleRejectBid(bid.id)}
+                            className="reject-bid-button"
+                          >
+                            Отклонить
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   };
 
   const statusInfo = getStatusInfo(project.status_id);
+
+  // Добавляем новую функцию для получения названия категории по ID
+  const getCategoryNameById = (categoryId) => {
+    const category = categories.find(cat => cat.id === parseInt(categoryId));
+    return category ? category.name : 'Категория не указана';
+  };
 
   return (
     <div className="project-card">
@@ -500,7 +793,9 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
               </li>
             )}
             <li>
-              <strong>Категория:</strong> {project.category}
+              <strong>Категория:</strong> {categories.length > 0 && project.category_id 
+                ? getCategoryNameById(project.category_id) 
+                : (project.category || 'Загрузка...')}
             </li>
             <li>
               <strong>Дата создания:</strong> {formatDate(project.created_at)}
@@ -525,20 +820,6 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
             <button onClick={fetchBids} className="view-bids-button">
               Посмотреть отклики
             </button>
-            <div className="status-control">
-              <select
-                value={project.status_id}
-                onChange={(e) => handleStatusChange(e.target.value)}
-                className="status-select"
-              >
-                <option value="1">Активный</option>
-                <option value="2">В работе</option>
-                <option value="3">Завершен</option>
-              </select>
-              {statusUpdateError && (
-                <div className="error-message">{statusUpdateError}</div>
-              )}
-            </div>
             <button onClick={() => setShowEditForm(true)} className="edit-btn">
               Изменить заказ
             </button>
@@ -622,10 +903,10 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
                   <label>Название</label>
                   <input
                     type="text"
-                    value={orderData.title}
+                    value={orderData.name}
                     onChange={(e) => setOrderData({
                       ...orderData,
-                      title: e.target.value
+                      name: e.target.value
                     })}
                     required
                   />
@@ -646,47 +927,46 @@ const ProjectCard = ({ project, isOwner, onDelete }) => {
                   <label>Стартовая цена (₽)</label>
                   <input
                     type="number"
-                    value={orderData.start_price}
+                    value={orderData.startPrice}
                     onChange={(e) => setOrderData({
                       ...orderData,
-                      start_price: e.target.value
+                      startPrice: e.target.value
                     })}
                     required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Дедлайн</label>
-                  <input
-                    type="datetime-local"
-                    value={orderData.deadline ? new Date(orderData.deadline).toISOString().slice(0, 16) : ''}
-                    onChange={(e) => setOrderData({
-                      ...orderData,
-                      deadline: e.target.value
-                    })}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Требования</label>
-                  <textarea
-                    value={orderData.requirements}
-                    onChange={(e) => setOrderData({
-                      ...orderData,
-                      requirements: e.target.value
-                    })}
-                    rows="4"
                   />
                 </div>
                 <div className="form-group">
                   <label>Категория</label>
-                  <input
-                    type="text"
-                    value={orderData.category}
+                  <div className="category-display" style={{
+                    padding: '8px 12px',
+                    backgroundColor: '#f5f5f5',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    color: '#555'
+                  }}>
+                    {getCategoryNameById(orderData.categoryId)}
+                    <small style={{
+                      display: 'block',
+                      marginTop: '4px',
+                      color: '#888',
+                      fontSize: '12px'
+                    }}>(категория не может быть изменена)</small>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Статус</label>
+                  <select
+                    value={orderData.statusId}
                     onChange={(e) => setOrderData({
                       ...orderData,
-                      category: e.target.value
+                      statusId: parseInt(e.target.value)
                     })}
                     required
-                  />
+                  >
+                    <option value="1">Активный</option>
+                    <option value="2">В работе</option>
+                    <option value="3">Завершен</option>
+                  </select>
                 </div>
                 <div className="form-actions">
                   <button type="submit" className="save-button">
