@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { formatPrice } from '../utils/formatters';
 import "../styles/Profile.css";
 
 const Profile = () => {
@@ -27,6 +28,13 @@ const Profile = () => {
     1: "IT",
     2: "Design",
     3: "Marketing",
+  };
+
+  const statusNames = {
+    1: "Активный",
+    2: "В работе",
+    3: "Завершен",
+    4: "Отменен"
   };
 
   useEffect(() => {
@@ -124,6 +132,15 @@ const Profile = () => {
         const data = await response.json();
         const formattedReviews = await Promise.all(data.map(async review => {
           try {
+            if (!review.reviewerId) {
+              return {
+                ...review,
+                createdAt: formatDate(review.createdAt),
+                reviewerName: "Анонимный пользователь",
+                canDelete: false
+              };
+            }
+
             const reviewerResponse = await fetch(`http://localhost:8000/user/${review.reviewerId}`, {
               method: "GET",
               headers: {
@@ -139,7 +156,7 @@ const Profile = () => {
             return {
               ...review,
               createdAt: formatDate(review.createdAt),
-              reviewerName: reviewerData 
+              reviewerName: reviewerData && reviewerData.firstName && reviewerData.lastName
                 ? `${reviewerData.firstName} ${reviewerData.lastName}`
                 : "Анонимный пользователь",
               canDelete
@@ -259,6 +276,20 @@ const Profile = () => {
     return null;
   };
 
+  const handleOrderClick = (orderId) => {
+    navigate(`/project/${orderId}`);
+  };
+
+  const getStatusClass = (statusId) => {
+    const statusClasses = {
+      1: "status-active",
+      2: "status-in-progress",
+      3: "status-completed",
+      4: "status-cancelled"
+    };
+    return statusClasses[statusId] || "status-unknown";
+  };
+
   if (loadingUser) return <div className="loading">Загрузка профиля...</div>;
   if (error) return <div className="error">{error}</div>;
   if (!userData) return <div className="error">Пользователь не найден</div>;
@@ -291,22 +322,114 @@ const Profile = () => {
 
       {isCurrentUser && (
         <div className="orders-section">
-          <h3>Мои заказы</h3>
+          <h3>Мои проекты</h3>
           <div className="orders-list">
             {loadingOrders ? (
-              <p className="loading">Загрузка заказов...</p>
+              <p className="loading">Загрузка проектов...</p>
             ) : orders.length === 0 ? (
-              <p className="empty-message">Заказов пока нет.</p>
+              <p className="empty-message">Проектов пока нет.</p>
             ) : (
-              orders.map((order) => (
-                <div key={order.id} className="order-card">
-                  <h4>{order.name}</h4>
-                  <p><strong>Категория:</strong> {order.category_name}</p>
-                  <p><strong>Цена:</strong> {order.start_price}₽</p>
-                  <p><strong>Описание:</strong> {order.description}</p>
-                  <p><strong>Ведет:</strong> {order.author_name}</p>
+              <>
+                {/* Активные проекты */}
+                <div className="orders-group">
+                  <h4>Активные проекты</h4>
+                  <div className="orders-grid">
+                    {orders
+                      .filter(order => order.status_id === 1)
+                      .map((order) => (
+                        <div 
+                          key={order.id} 
+                          className="order-card"
+                          onClick={() => handleOrderClick(order.id)}
+                        >
+                          <h4>{order.name}</h4>
+                          <div className="order-details">
+                            <p><strong>Категория:</strong> {order.category_name}</p>
+                            <p className="price"><strong>Стартовая цена:</strong> {formatPrice(order.start_price)} ₽</p>
+                            <span className={`status ${getStatusClass(order.status_id)}`}>
+                              {statusNames[order.status_id]}
+                            </span>
+                          </div>
+                        </div>
+                    ))}
+                  </div>
                 </div>
-              ))
+
+                {/* Проекты в работе */}
+                <div className="orders-group">
+                  <h4>Проекты в работе</h4>
+                  <div className="orders-grid">
+                    {orders
+                      .filter(order => order.status_id === 2)
+                      .map((order) => (
+                        <div 
+                          key={order.id} 
+                          className="order-card"
+                          onClick={() => handleOrderClick(order.id)}
+                        >
+                          <h4>{order.name}</h4>
+                          <div className="order-details">
+                            <p><strong>Категория:</strong> {order.category_name}</p>
+                            <p className="price"><strong>Стартовая цена:</strong> {formatPrice(order.start_price)} ₽</p>
+                            <span className={`status ${getStatusClass(order.status_id)}`}>
+                              {statusNames[order.status_id]}
+                            </span>
+                          </div>
+                        </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Завершенные проекты */}
+                <div className="orders-group">
+                  <h4>Завершенные проекты</h4>
+                  <div className="orders-grid">
+                    {orders
+                      .filter(order => order.status_id === 3)
+                      .map((order) => (
+                        <div 
+                          key={order.id} 
+                          className="order-card"
+                          onClick={() => handleOrderClick(order.id)}
+                        >
+                          <h4>{order.name}</h4>
+                          <div className="order-details">
+                            <p><strong>Категория:</strong> {order.category_name}</p>
+                            <p className="price"><strong>Стартовая цена:</strong> {formatPrice(order.start_price)} ₽</p>
+                            <span className={`status ${getStatusClass(order.status_id)}`}>
+                              {statusNames[order.status_id]}
+                            </span>
+                          </div>
+                        </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Отмененные проекты */}
+                <div className="orders-group">
+                  <h4>Отмененные проекты</h4>
+                  <div className="orders-grid">
+                    {orders
+                      .filter(order => order.status_id === 4)
+                      .map((order) => (
+                        <div 
+                          key={order.id} 
+                          className="order-card"
+                          onClick={() => handleOrderClick(order.id)}
+                        >
+                          <h4>{order.name}</h4>
+                          <div className="order-details">
+                            <p><strong>Категория:</strong> {order.category_name}</p>
+                            <p className="price"><strong>Стартовая цена:</strong> {formatPrice(order.start_price)} ₽</p>
+                            <span className={`status ${getStatusClass(order.status_id)}`}>
+                              {statusNames[order.status_id]}
+                            </span>
+                          </div>
+                        </div>
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>
