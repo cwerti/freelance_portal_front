@@ -188,3 +188,20 @@
         font-size: 1.1rem;
     }
 }
+
+.no-messages {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+}
+
+.no-messages p {
+    margin: 0;
+    font-size: 0.95rem;
+}
